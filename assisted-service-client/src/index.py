@@ -158,10 +158,7 @@ async def handle_inspect():
         return json_response({"error": str(e)}, status=500)
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = url.split("?")[0]
-    if "://" in path:
-        path = "/" + path.split("/", 3)[-1]
+    path = urlparse(request.url).path
 
     if path == "/llms.txt" or path == "/llms-full.txt":
         headers = Headers.new({"Content-Type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"}.items())
