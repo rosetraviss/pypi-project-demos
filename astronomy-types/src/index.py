@@ -4,93 +4,122 @@ from js import Headers, Response
 
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#4f46e5"/><path d="M50 15 L60 40 L85 45 L65 60 L70 85 L50 70 L30 85 L35 60 L15 45 L40 40 Z" fill="#fff"/></svg>"""
 
+
 STYLE_CSS = """:root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --bg: #f8fafc;
+  --primary: #145d91;
+  --primary-hover: #3776ab;
+  --bg: #f7f9ff;
   --surface: #ffffff;
-  --text: #0f172a;
-  --text-muted: #64748b;
+  --text: #001d32;
+  --text-muted: #41474f;
   --border: #e2e8f0;
-  --success-bg: #dcfce7;
-  --success-text: #166534;
-  --error-bg: #fee2e2;
-  --error-text: #991b1b;
+  --success-bg: #ebffd5;
+  --success-text: #316600;
+  --error-bg: #ffdad6;
+  --error-text: #ba1a1a;
+  
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.5;
-  padding: 2rem 1rem;
+  padding: 48px 24px;
 }
 
 .container { max-width: 800px; margin: 0 auto; }
 
-header { text-align: center; margin-bottom: 2rem; }
-h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-.subtitle { color: var(--text-muted); }
+header { text-align: center; margin-bottom: 40px; }
+h1 {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.subtitle { color: var(--text-muted); font-size: 16px; }
 
 .card {
   background: var(--surface);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow: 0 4px 12px rgba(31, 66, 94, 0.08);
 }
-h2 { font-size: 1.25rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
 
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-.info-item { background: var(--bg); padding: 1rem; border-radius: 8px; font-size: 0.875rem; }
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.info-item { background: #f8fafc; padding: 16px; border-radius: 4px; font-size: 14px; border: 1px solid var(--border); }
 
-.tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
 .tab {
-  padding: 0.75rem 1.5rem;
+  padding: 10px 16px;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   font-weight: 500;
+  font-size: 14px;
   color: var(--text-muted);
   transition: all 0.2s ease;
 }
-.tab:hover { color: var(--text); background: var(--bg); }
-.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab:hover { color: var(--text); background: rgba(20, 93, 145, 0.05); }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
 
 .tab-content { display: none; animation: fadeIn 0.3s ease; }
 .tab-content.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.input-group { margin-bottom: 1rem; }
-.input-group.row { display: flex; gap: 1rem; }
+.input-group { margin-bottom: 16px; }
+.input-group.row { display: flex; gap: 16px; }
 .col { flex: 1; }
-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-muted); }
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: var(--text-muted);
+}
 input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 10px 14px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 1rem;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #f8fafc;
+  color: var(--text);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(20, 93, 145, 0.15); }
 
 .action-btn {
   width: 100%;
-  padding: 0.75rem;
+  padding: 12px;
   background: var(--primary);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
@@ -98,23 +127,24 @@ input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px
 .action-btn:active { transform: scale(0.98); }
 
 .result-panel {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border-radius: 8px;
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
   display: none;
 }
 .result-panel.show { display: block; animation: slideDown 0.3s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-.success { background: var(--success-bg); color: var(--success-text); padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; }
-.error { background: var(--error-bg); color: var(--error-text); padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; }
-.meta { font-size: 0.875rem; color: var(--text-muted); text-align: center; }
-code { background: var(--bg); padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; }
+.success { background: var(--success-bg); color: var(--success-text); padding: 12px; border-radius: 4px; margin-bottom: 8px; font-size: 14px; }
+.error { background: var(--error-bg); color: var(--error-text); padding: 12px; border-radius: 4px; margin-bottom: 8px; font-size: 14px; }
+.meta { font-size: 12px; color: var(--text-muted); text-align: center; }
+code { background: #f8fafc; padding: 2px 4px; border-radius: 4px; font-family: var(--font-mono); font-size: 12px; border: 1px solid var(--border); }
 
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid var(--border);
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -124,15 +154,15 @@ code { background: var(--bg); padding: 0.2rem 0.4rem; border-radius: 4px; font-f
 
 footer {
   text-align: center;
-  margin-top: 3rem;
-  padding-top: 2rem;
+  margin-top: 48px;
+  padding-top: 24px;
   border-top: 1px solid var(--border);
-  font-size: 0.875rem;
+  font-size: 14px;
   color: var(--text-muted);
 }
-footer a { color: var(--primary); text-decoration: none; }
+footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
 footer a:hover { text-decoration: underline; }
-footer p { margin-bottom: 0.5rem; }
+footer p { margin-bottom: 8px; }
 """
 
 INDEX_HTML = """<!DOCTYPE html>
@@ -141,6 +171,10 @@ INDEX_HTML = """<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>astronomy-types Cloudflare Worker Demo</title>
+  <link rel="icon" href="/favicon.ico" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -246,8 +280,8 @@ INDEX_HTML = """<!DOCTYPE html>
         if (data.error) throw new Error(data.error);
 
         grid.innerHTML = `
-          <div class="info-item"><strong>Available Functions:</strong> ${data.functions.length}</div>
-          <div class="info-item"><strong>Selected Conversions:</strong> ${data.functions.filter(f => f.includes('to_')).join(', ')}</div>
+          <div class="info-item"><strong>Available Functions:</strong> \${data.functions.length}</div>
+          <div class="info-item"><strong>Selected Conversions:</strong> \${data.functions.filter(f => f.includes('to_')).join(', ')}</div>
         `;
       } catch (err) {
         const grid = document.getElementById('pkg-info');
@@ -276,21 +310,21 @@ INDEX_HTML = """<!DOCTYPE html>
     function convertDegToHrs() {
       const v = document.getElementById('deg-input').value;
       if (!v) return;
-      doFetch(`/api/convert?type=deg_to_hrs&deg=${v}`, 'res-deg-to-hrs');
+      doFetch(\`/api/convert?type=deg_to_hrs&deg=\${v}\`, 'res-deg-to-hrs');
     }
 
     function convertDmsToDeg() {
       const d = document.getElementById('dms-d').value || 0;
       const m = document.getElementById('dms-m').value || 0;
       const s = document.getElementById('dms-s').value || 0;
-      doFetch(`/api/convert?type=dms_to_deg&d=${d}&m=${m}&s=${s}`, 'res-dms-to-deg');
+      doFetch(\`/api/convert?type=dms_to_deg&d=\${d}&m=\${m}&s=\${s}\`, 'res-dms-to-deg');
     }
 
     function convertHmsToDeg() {
       const h = document.getElementById('hms-h').value || 0;
       const m = document.getElementById('hms-m').value || 0;
       const s = document.getElementById('hms-s').value || 0;
-      doFetch(`/api/convert?type=hms_to_deg&h=${h}&m=${m}&s=${s}`, 'res-hms-to-deg');
+      doFetch(\`/api/convert?type=hms_to_deg&h=\${h}&m=\${m}&s=\${s}\`, 'res-hms-to-deg');
     }
 
     // Init
