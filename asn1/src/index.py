@@ -304,6 +304,8 @@ def handle_decode(request_data):
         decoder.start(encoded_bytes)
 
         tag, value = decoder.read()
+        if tag is None:
+            return {"error": "No valid ASN.1 tag found in the provided hex string"}
 
         tag_info = f"Class: {tag.cls.name}, Type: {tag.typ.name}, Number: {tag.nr.name if hasattr(tag.nr, 'name') else tag.nr}"
 
