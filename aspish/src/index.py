@@ -334,13 +334,13 @@ def solve_siblings(parents):
 
     X, Y, Z = aspish.var("X"), aspish.var("Y"), aspish.var("Z")
 
-    # rule: sibling(Y, Z) :- parent(X, Y), parent(X, Z), Y != Z.
+    # rule: sibling(Y, Z) :- parent(X, Y), parent(X, Z), Y < Z.
     rule = aspish.language.Rule(
         head=Sibling(name1=Y, name2=Z),
         body=(
             Parent(name=X, child=Y),
             Parent(name=X, child=Z),
-            Y != Z
+            Y < Z
         )
     )
     solver.add(rule)
