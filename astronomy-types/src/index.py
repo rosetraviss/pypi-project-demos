@@ -300,28 +300,6 @@ INDEX_HTML = """<!DOCTYPE html>
 </html>
 """
 
-LLMS_TXT = """# astronomy-types Cloudflare Worker
-
-This is a demo for astronomy-types running as a Python Cloudflare Worker. It demonstrates simple astronomical conversions using the package's type-safe constructs. For details on usage, see the /api/info and /api/convert endpoints or visit https://pypi.rosetraviss.uk/astronomy-types.
-"""
-
-LLMS_FULL_TXT = """# astronomy-types Cloudflare Worker (Full Documentation)
-
-This is a demo for astronomy-types running as a Python Cloudflare Worker. It demonstrates simple astronomical conversions using the package's type-safe constructs.
-
-## Features
-- Provides an interactive web UI for performing conversions (e.g. Degrees to Hours, DMS to Degrees, HMS to Degrees).
-- Built completely using Cloudflare Python Workers capabilities.
-- Live inspection of `astronomy-types` capabilities through `/api/info`.
-
-## Endpoints
-- `/`: Interactive UI
-- `/api/info`: View available package functions
-- `/api/convert`: Perform conversions
-
-For more info, see https://pypi.rosetraviss.uk/astronomy-types.
-"""
-
 def json_response(data, status=200):
     headers = Headers.new({
         "Content-Type": "application/json",
@@ -415,10 +393,5 @@ async def on_fetch(request, env):
     elif path == "/":
         headers = Headers.new({"Content-Type": "text/html; charset=utf-8"}.items())
         return Response.new(INDEX_HTML, headers=headers)
-
-    elif path in ["/llms.txt", "/llms-full.txt"]:
-        content = LLMS_TXT if path == "/llms.txt" else LLMS_FULL_TXT
-        headers = Headers.new({"Content-Type": "text/plain; charset=utf-8"}.items())
-        return Response.new(content, headers=headers)
 
     return Response.new("Not Found", status=404)

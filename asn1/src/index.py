@@ -5,40 +5,6 @@ import traceback
 
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📦</text></svg>"""
 
-LLMS_TXT = """# ASN.1 Demo API
-
-> Live demo API and UI for the `asn1` package on Cloudflare Workers, providing a web interface to encode and decode ASN.1 data types.
-
-## Deployment Details
-- **Demo URL**: https://asn1.pypi.rosetraviss.uk
-- **Package Page**: https://pypi.rosetraviss.uk/asn1
-- **Primary Host**: https://pypi.rosetraviss.uk
-
-## API Endpoints
-
-### `POST /api/encode`
-Encodes a given value into ASN.1 hex representation.
-
-#### Request Body
-- `type` (string): The data type to encode (`UTF8String`, `Integer`, `Boolean`).
-- `value` (string): The value to encode.
-
-#### Response Body
-- `hex` (string): The ASN.1 hex encoded representation.
-- `error` (string, optional): Error message if encoding fails.
-
-### `POST /api/decode`
-Decodes an ASN.1 hex string into its tag and value.
-
-#### Request Body
-- `hex` (string): The hex string to decode.
-
-#### Response Body
-- `tag` (string): The decoded ASN.1 tag information.
-- `value` (string): The decoded value.
-- `error` (string, optional): Error message if decoding fails.
-"""
-
 HTML_CONTENT = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -343,9 +309,6 @@ async def on_fetch(request, env=None):
     icon_headers = to_js_headers({"content-type": "image/svg+xml", "Cache-Control": "public, max-age=86400"})
 
     try:
-        if path == "/llms.txt" or path == "/llms-full.txt":
-            return Response.new(LLMS_TXT, headers=text_headers)
-
         if path == "/favicon.ico":
             return Response.new(FAVICON_SVG, headers=icon_headers)
 

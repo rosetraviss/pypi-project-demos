@@ -7,15 +7,6 @@ import ass
 
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎬</text></svg>"""
 
-LLMS_TXT = """# ass-imbk Demo API
-Demo for `ass-imbk` running as a Cloudflare Python Worker.
-"""
-
-LLMS_FULL_TXT = """# ass-imbk Demo API
-Demo for `ass-imbk` running as a Cloudflare Python Worker.
-Developed by contributors of https://pypi.rosetraviss.uk.
-"""
-
 FOOTER_HTML = """
 <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: var(--muted);">
     <p>Powered by <a href="https://pypi.rosetraviss.uk/project/ass-imbk/" target="_blank" style="color: var(--blue);">ass-imbk</a></p>
@@ -389,12 +380,6 @@ async def on_fetch(request, env):
             "Access-Control-Allow-Headers": "Content-Type",
         }.items())
         return Response.new("", headers=headers)
-
-    if path == "/llms.txt":
-        return text_response(LLMS_TXT)
-
-    if path == "/llms-full.txt":
-        return text_response(LLMS_FULL_TXT)
 
     if path == "/favicon.ico":
         return text_response(FAVICON_SVG, "image/svg+xml")

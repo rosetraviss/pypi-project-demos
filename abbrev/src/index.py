@@ -7,33 +7,6 @@ import abbrev
 # Documentation & Assets
 # ─────────────────────────────────────────────────────────────────────────────
 
-LLMS_TXT = """# abbrev Demo API
-
-> Live demo API and UI for the pure-Python `abbrev` package on Cloudflare Workers, resolving shortest unique abbreviation mappings.
-
-## Deployment Details
-- **Demo URL**: https://abbrev.pypi.rosetraviss.uk
-- **Package Page**: https://pypi.rosetraviss.uk/abbrev
-- **Primary Host**: https://pypi.rosetraviss.uk
-
-## API Endpoint
-
-### `POST /api/abbrev`
-Computes abbreviations for a list of words, with optional query lookups.
-
-#### Request Body
-- `words` (array of strings, required): A list of words to calculate abbreviations for.
-- `query` (string, optional): A specific query to look up.
-- `multi` (boolean, optional, default `false`): If `true`, returns all matches.
-- `unique` (boolean, optional, default `true`): If `true`, checks for uniqueness.
-
-#### Response Body
-- `shortest_mapping` (object): Map of each input word to its shortest unique abbreviation.
-- `full_mapping` (object): Map of all valid abbreviation prefixes to their resolved words.
-- `query_result` (any, optional): Result of looking up the `query` parameter.
-- `query_error` (string, optional): Error message if query lookup fails (e.g. key is ambiguous).
-"""
-
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🐜</text></svg>"""
 
 
@@ -443,10 +416,6 @@ async def on_fetch(request, env):
     # Normalise path: strip protocol+host
     if "://" in path:
         path = "/" + path.split("/", 3)[-1]
-
-    if path == "/llms.txt" or path == "/llms-full.txt":
-        headers = Headers.new({"Content-Type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"}.items())
-        return Response.new(LLMS_TXT, headers=headers)
 
     if path == "/favicon.ico":
         headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
