@@ -1,0 +1,5 @@
+# astro-mmdc Demo
+
+A Cloudflare Python Worker demonstrating the `astro-mmdc` package capabilities.
+
+This simple demo provides a web interface with endpoints to use the `astro-mmdc` package, allowing query and simple modeling operations. The API endpoints interact with the `astro_mmdc` python module to perform cone searches for observations and generate emission modeling simulations.
