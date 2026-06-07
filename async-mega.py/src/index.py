@@ -3,8 +3,6 @@ import json
 from unittest.mock import MagicMock
 
 # Mock Crypto packages to avoid native compilation issues in Pyodide
-class DummyModule:
-    pass
 
 for mod in [
     'Crypto', 'Crypto.Cipher', 'Crypto.Cipher.AES',
@@ -73,8 +71,8 @@ HTML = """<!DOCTYPE html>
 """
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = "/" + url.split("/", 3)[-1] if "://" in url else url.split("?")[0]
+    from urllib.parse import urlparse
+    path = urlparse(request.url).path or "/"
 
     if path == "/api/status":
         headers = Headers.new({"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}.items())
