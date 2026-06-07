@@ -221,3 +221,4 @@ node_modules
 .wrangler
 
 atlaslevels/.venv/
+python_modules/

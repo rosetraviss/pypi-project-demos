@@ -1,3 +1,0 @@
-# ass-imbk Demo API
-
-Demo for `ass-imbk` running as a Cloudflare Python Worker.
