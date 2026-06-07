@@ -167,24 +167,27 @@ async def run_limited_tasks(total_tasks: int, concurrency_limit: int):
     return results
 
 async def on_fetch(request, env):
-    url = request.url
+    from urllib.parse import urlparse, parse_qs
+    parsed_url = urlparse(request.url)
+    path = parsed_url.path
 
-    if url.endswith("/favicon.ico"):
+    if path.endswith("/favicon.ico"):
         headers = Headers.new([("Content-Type", "image/gif")])
         favicon_data = bytes.fromhex("47494638396101000100800000000000ffffff21f90401000000002c000000000100010000020144003b")
         return Response.new(favicon_data, headers=headers)
 
-    if "/api/run" in url:
+    if path == "/api/run":
         try:
-            # Parse query parameters manually
-            query_string = url.split("?")[1] if "?" in url else ""
-            params = dict(qs.split("=") for qs in query_string.split("&") if "=" in qs)
+            query_params = parse_qs(parsed_url.query)
+            
+            tasks_val = query_params.get("tasks")
+            total_tasks = int(tasks_val[0]) if tasks_val else 5
+            
+            limit_val = query_params.get("limit")
+            concurrency_limit = int(limit_val[0]) if limit_val else 2
 
-            total_tasks = int(params.get("tasks", 5))
-            concurrency_limit = int(params.get("limit", 2))
-
-            total_tasks = min(total_tasks, 50)
-            concurrency_limit = min(concurrency_limit, 10)
+            total_tasks = max(1, min(total_tasks, 50))
+            concurrency_limit = max(1, min(concurrency_limit, 10))
 
             start_time = asyncio.get_running_loop().time()
             results = await run_limited_tasks(total_tasks, concurrency_limit)
