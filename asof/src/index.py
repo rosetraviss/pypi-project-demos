@@ -376,8 +376,11 @@ async def handle_asof(query: dict):
         url = f"https://pypi.org/simple/{pkg}/"
         resp = await pyfetch(url, headers={"Accept": "application/vnd.pypi.simple.v1+json"})
 
+        if resp.status == 404:
+            return json_response({"error": f"Package '{pkg}' not found on PyPI"}, status=404)
+
         if not resp.ok:
-            return json_response({"error": f"{resp.status}: {resp.status_text} when attempting to query PyPI"}, status=500)
+            return json_response({"error": f"{resp.status}: {resp.status_text} when attempting to query PyPI"}, status=502)
 
         json_data = await resp.string()
         file_objs = json.loads(json_data)["files"]
