@@ -1,0 +1,48 @@
+# ASN.1 Demo API
+
+> Live demo API and UI for the `asn1` package on Cloudflare Workers, providing a web interface to encode and decode ASN.1 data types.
+
+## Deployment Details
+- **Demo URL**: https://asn1.pypi.rosetraviss.uk
+- **Package Page**: https://pypi.rosetraviss.uk/asn1
+- **Primary Host**: https://pypi.rosetraviss.uk
+
+## API Endpoints
+
+### `POST /api/encode`
+Encodes a given value into ASN.1 hex representation.
+
+#### Request Body
+- `type` (string): The data type to encode (`UTF8String`, `Integer`, `Boolean`).
+- `value` (string): The value to encode.
+
+#### Response Body
+- `hex` (string): The ASN.1 hex encoded representation.
+- `error` (string, optional): Error message if encoding fails.
+
+### `POST /api/decode`
+Decodes an ASN.1 hex string into its tag and value.
+
+#### Request Body
+- `hex` (string): The hex string to decode.
+
+#### Response Body
+- `tag` (string): The decoded ASN.1 tag information.
+- `value` (string): The decoded value.
+- `error` (string, optional): Error message if decoding fails.
+
+## Usage Example
+
+To encode a string:
+```bash
+curl -X POST https://asn1.pypi.rosetraviss.uk/api/encode \
+  -H "Content-Type: application/json" \
+  -d '{"type": "UTF8String", "value": "hello"}'
+```
+
+To decode a hex string:
+```bash
+curl -X POST https://asn1.pypi.rosetraviss.uk/api/decode \
+  -H "Content-Type: application/json" \
+  -d '{"hex": "0c0568656c6c6f"}'
+```
