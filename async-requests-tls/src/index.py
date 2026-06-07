@@ -207,14 +207,38 @@ FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
 </svg>"""
 
 async def handle_fetch(request):
+    if request.method != "POST":
+        return Response.new(
+            json.dumps({"error": "Method Not Allowed"}),
+            status=405,
+            headers=Headers.new({"Content-Type": "application/json"}.items())
+        )
     try:
-        body = await request.json()
-        if isinstance(body, Object):
-            body = body.to_py()
+        try:
+            body = await request.json()
+            if isinstance(body, Object):
+                body = body.to_py()
+        except Exception:
+            return Response.new(
+                json.dumps({"error": "Invalid JSON"}),
+                status=400,
+                headers=Headers.new({"Content-Type": "application/json"}.items())
+            )
+
+        if not isinstance(body, dict):
+            return Response.new(
+                json.dumps({"error": "Request body must be a JSON object"}),
+                status=400,
+                headers=Headers.new({"Content-Type": "application/json"}.items())
+            )
 
         target_url = body.get('url')
         if not target_url:
-            return Response.new(json.dumps({"error": "URL is required"}), status=400)
+            return Response.new(
+                json.dumps({"error": "URL is required"}),
+                status=400,
+                headers=Headers.new({"Content-Type": "application/json"}.items())
+            )
 
         # Use the mocked Session
         session = async_requests_tls.session.AsyncSession()
@@ -225,24 +249,26 @@ async def handle_fetch(request):
             "data": res.text[:1000] + ("..." if len(res.text) > 1000 else "")
         }), headers=Headers.new({"Content-Type": "application/json"}.items()))
     except Exception as e:
+        print(f"Error in handle_fetch: {e}")
         import traceback
-        return Response.new(json.dumps({"error": str(e) + "\n" + traceback.format_exc()}), status=500, headers=Headers.new({"Content-Type": "application/json"}.items()))
+        traceback.print_exc()
+        return Response.new(
+            json.dumps({"error": "Internal Server Error"}),
+            status=500,
+            headers=Headers.new({"Content-Type": "application/json"}.items())
+        )
 
 async def on_fetch(request, env):
-    from js import URL
-    url_obj = URL.new(request.url)
-    path = url_obj.pathname
+    from urllib.parse import urlparse
+    parsed_url = urlparse(request.url)
+    path = parsed_url.path
 
-    if path == "/api/fetch" and request.method == "POST":
+    if path == "/api/fetch":
         return await handle_fetch(request)
 
     if path == "/favicon.ico":
         headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
         return Response.new(FAVICON_SVG, headers=headers)
-
-    if path == "/llms.txt" or path == "/llms-full.txt":
-        headers = Headers.new({"Content-Type": "text/plain; charset=utf-8"}.items())
-        return Response.new("Documentation placeholder.", headers=headers)
 
     headers = Headers.new({"Content-Type": "text/html; charset=utf-8"}.items())
     return Response.new(HTML, headers=headers)
