@@ -1,0 +1,27 @@
+# Astrocyte Integration Tavus Demo API
+
+> Live demo API and UI for the `astrocyte-integration-tavus` package on Cloudflare Workers, providing a web interface to interact with the Tavus Conversational Video Interface.
+
+## Deployment Details
+- **Demo URL**: https://astrocyte-integration-tavus.pypi.rosetraviss.uk
+- **Package Page**: https://pypi.rosetraviss.uk/astrocyte-integration-tavus
+- **Primary Host**: https://pypi.rosetraviss.uk
+
+## API Endpoints
+
+### `GET /api/info`
+Returns general metadata about the installed library version.
+
+### `GET /api/list_conversations`
+List Tavus conversations. Requires providing an API key in the `Authorization` header.
+
+#### Query Parameters
+- `limit` (integer, optional)
+- `page` (integer, optional)
+- `status` (string, optional)
+
+### `GET /api/get_conversation`
+Get details for a specific Tavus conversation. Requires providing an API key in the `Authorization` header.
+
+#### Query Parameters
+- `conversation_id` (string, required): The ID of the conversation to fetch.
