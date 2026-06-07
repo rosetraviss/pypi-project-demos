@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>astronomy-types Cloudflare Worker Demo</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>astronomy-types Demo</h1>
+      <p class="subtitle">Cloudflare Python Worker running Pyodide</p>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Package Info</h2>
+        <div id="pkg-info" class="info-grid">
+          <div class="spinner"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Conversion Tools</h2>
+
+        <div class="tabs">
+          <button class="tab active" data-target="deg-to-hrs">Degrees to Hours</button>
+          <button class="tab" data-target="dms-to-deg">DMS to Degrees</button>
+          <button class="tab" data-target="hms-to-deg">HMS to Degrees</button>
+        </div>
+
+        <!-- Degrees to Hours -->
+        <div id="deg-to-hrs" class="tab-content active">
+          <div class="input-group">
+            <label for="deg-input">Degrees (e.g. 180.5)</label>
+            <input type="number" id="deg-input" step="any" placeholder="Enter degrees">
+          </div>
+          <button onclick="convertDegToHrs()" class="action-btn">Convert</button>
+          <div id="res-deg-to-hrs" class="result-panel"></div>
+        </div>
+
+        <!-- DMS to Degrees -->
+        <div id="dms-to-deg" class="tab-content">
+          <div class="input-group row">
+            <div class="col">
+              <label>Degrees</label>
+              <input type="number" id="dms-d" placeholder="D">
+            </div>
+            <div class="col">
+              <label>Minutes</label>
+              <input type="number" id="dms-m" placeholder="M">
+            </div>
+            <div class="col">
+              <label>Seconds</label>
+              <input type="number" id="dms-s" step="any" placeholder="S">
+            </div>
+          </div>
+          <button onclick="convertDmsToDeg()" class="action-btn">Convert</button>
+          <div id="res-dms-to-deg" class="result-panel"></div>
+        </div>
+
+        <!-- HMS to Degrees -->
+        <div id="hms-to-deg" class="tab-content">
+          <div class="input-group row">
+            <div class="col">
+              <label>Hours</label>
+              <input type="number" id="hms-h" placeholder="H">
+            </div>
+            <div class="col">
+              <label>Minutes</label>
+              <input type="number" id="hms-m" placeholder="M">
+            </div>
+            <div class="col">
+              <label>Seconds</label>
+              <input type="number" id="hms-s" step="any" placeholder="S">
+            </div>
+          </div>
+          <button onclick="convertHmsToDeg()" class="action-btn">Convert</button>
+          <div id="res-hms-to-deg" class="result-panel"></div>
+        </div>
+
+      </section>
+    </main>
+
+    <footer>
+      <p>Powered by <a href="https://pypi.rosetraviss.uk" target="_blank" rel="noopener">pypi.rosetraviss.uk</a></p>
+      <p><a href="https://pypi.rosetraviss.uk/astronomy-types" target="_blank" rel="noopener">astronomy-types on PyPI Mirror</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Tab switching logic
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+      });
+    });
+
+    // Fetch Info
+    async function loadInfo() {
+      try {
+        const res = await fetch('/api/info');
+        const data = await res.json();
+        const grid = document.getElementById('pkg-info');
+        if (data.error) throw new Error(data.error);
+
+        grid.innerHTML = `
+          <div class="info-item"><strong>Available Functions:</strong> ${data.functions.length}</div>
+          <div class="info-item"><strong>Selected Conversions:</strong> ${data.functions.filter(f => f.includes('to_')).join(', ')}</div>
+        `;
+      } catch (err) {
+        const grid = document.getElementById('pkg-info');
+        grid.innerHTML = '<div class="error">Error loading info: <span class="err-msg"></span></div>';
+        grid.querySelector('.err-msg').textContent = err.message;
+      }
+    }
+
+    async function doFetch(url, resultElId) {
+      const el = document.getElementById(resultElId);
+      el.innerHTML = '<div class="spinner"></div>';
+      el.classList.add('show');
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        el.innerHTML = '<div class="success"><strong>Result:</strong> <span class="res-val"></span></div><div class="meta"><code class="call-val"></code></div>';
+        el.querySelector('.res-val').textContent = data.result;
+        el.querySelector('.call-val').textContent = data.call;
+      } catch (err) {
+        el.innerHTML = '<div class="error"></div>';
+        el.querySelector('.error').textContent = err.message;
+      }
+    }
+
+    function convertDegToHrs() {
+      const v = document.getElementById('deg-input').value;
+      if (!v) return;
+      doFetch(`/api/convert?type=deg_to_hrs&deg=${v}`, 'res-deg-to-hrs');
+    }
+
+    function convertDmsToDeg() {
+      const d = document.getElementById('dms-d').value || 0;
+      const m = document.getElementById('dms-m').value || 0;
+      const s = document.getElementById('dms-s').value || 0;
+      doFetch(`/api/convert?type=dms_to_deg&d=${d}&m=${m}&s=${s}`, 'res-dms-to-deg');
+    }
+
+    function convertHmsToDeg() {
+      const h = document.getElementById('hms-h').value || 0;
+      const m = document.getElementById('hms-m').value || 0;
+      const s = document.getElementById('hms-s').value || 0;
+      doFetch(`/api/convert?type=hms_to_deg&h=${h}&m=${m}&s=${s}`, 'res-hms-to-deg');
+    }
+
+    // Init
+    loadInfo();
+  </script>
+</body>
+</html>
