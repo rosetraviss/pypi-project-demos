@@ -321,7 +321,17 @@ async def handle_hash_event(request):
 
     try:
         body = await request.json()
-        body_dict = body.to_py() if hasattr(body, 'to_py') else dict(body)
+        if body is None:
+            body_dict = {}
+        elif hasattr(body, 'to_py'):
+            body_dict = body.to_py()
+        elif isinstance(body, dict):
+            body_dict = body
+        else:
+            body_dict = {}
+
+        if not isinstance(body_dict, dict):
+            return json_response({"error": "Invalid request body format. Expected a JSON object."}, status=400)
 
         event_type = body_dict.get("event_type", "UNKNOWN")
         actor = body_dict.get("actor", "anonymous")
@@ -347,10 +357,8 @@ async def handle_hash_event(request):
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = url.split("?")[0]
-    if "://" in path:
-        path = "/" + path.split("/", 3)[-1]
+    from urllib.parse import urlparse
+    path = urlparse(request.url).path or "/"
 
     if request.method == "OPTIONS":
         headers = Headers.new({
@@ -359,10 +367,6 @@ async def on_fetch(request, env):
             "Access-Control-Allow-Headers": "Content-Type",
         }.items())
         return Response.new("", headers=headers)
-
-    if path == "/llms.txt" or path == "/llms-full.txt":
-        headers = Headers.new({"Content-Type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"}.items())
-        return Response.new(LLMS_TXT, headers=headers)
 
     if path == "/favicon.ico":
         headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
