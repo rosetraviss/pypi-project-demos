@@ -1,0 +1,25 @@
+# attestplane Demo API
+
+> Live demo API and UI for the `attestplane` package on Cloudflare Workers, providing ways to create EventDrafts and compute their hashes.
+
+## Deployment Details
+- **Demo URL**: https://attestplane.pypi.rosetraviss.uk
+- **Package Page**: https://pypi.rosetraviss.uk/attestplane
+- **Primary Host**: https://pypi.rosetraviss.uk
+
+## API Endpoints
+
+### `GET /api/info`
+Returns general metadata about the attestplane package version running.
+
+### `POST /api/hash_event`
+Computes the hash of a given event draft.
+
+#### Request Body
+- `event_type` (string, required): Event type string.
+- `actor` (string, required): The actor creating the event.
+- `payload` (object, optional): Event payload.
+
+#### Response Body
+- `hash` (string): The computed hash.
+- `event` (object): The event details.
