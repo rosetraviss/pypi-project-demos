@@ -1,0 +1,12 @@
+[project]
+name = "assisted-service-client-demo"
+version = "0.1.0"
+description = "Demo for the assisted-service-client package"
+dependencies = [
+    "assisted-service-client>=2.53.0",
+]
+readme = "README.md"
+requires-python = ">= 3.12"
+
+[tool.uv]
+package = false

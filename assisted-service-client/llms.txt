@@ -1,0 +1,3 @@
+# assisted-service-client Cloudflare Worker Demo
+This is a demo of `assisted-service-client` running as a Cloudflare Python Worker.
+See https://pypi.rosetraviss.uk/assisted-service-client

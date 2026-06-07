@@ -1,0 +1,4 @@
+# assisted-service-client Cloudflare Worker Demo (Full)
+This is a demo of `assisted-service-client` running as a Cloudflare Python Worker.
+See https://pypi.rosetraviss.uk/assisted-service-client
+The source code demonstrates loading the package in Pyodide environment and extracting configuration parameters.
