@@ -338,12 +338,15 @@ async def handle_parse(request):
                 # Format timedelta
                 def format_td(td):
                     if not td: return "0:00:00.00"
-                    total_seconds = int(td.total_seconds())
+                    is_negative = td.total_seconds() < 0
+                    abs_td = abs(td)
+                    total_seconds = int(abs_td.total_seconds())
                     hours = total_seconds // 3600
                     minutes = (total_seconds % 3600) // 60
                     seconds = total_seconds % 60
-                    cents = int(td.microseconds / 10000)
-                    return f"{hours}:{minutes:02d}:{seconds:02d}.{cents:02d}"
+                    cents = int(abs_td.microseconds / 10000)
+                    sign = "-" if is_negative else ""
+                    return f"{sign}{hours}:{minutes:02d}:{seconds:02d}.{cents:02d}"
 
                 start_str = format_td(ev.start) if hasattr(ev, 'start') else ""
                 end_str = format_td(ev.end) if hasattr(ev, 'end') else ""
@@ -373,10 +376,8 @@ async def handle_parse(request):
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = url.split("?")[0]
-    if "://" in path:
-        path = "/" + path.split("/", 3)[-1]
+    from urllib.parse import urlparse
+    path = urlparse(request.url).path or "/"
 
     method = request.method
 
