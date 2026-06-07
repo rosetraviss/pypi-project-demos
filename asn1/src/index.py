@@ -3,13 +3,49 @@ import json
 import asn1
 import traceback
 
+FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📦</text></svg>"""
+
+LLMS_TXT = """# ASN.1 Demo API
+
+> Live demo API and UI for the `asn1` package on Cloudflare Workers, providing a web interface to encode and decode ASN.1 data types.
+
+## Deployment Details
+- **Demo URL**: https://asn1.pypi.rosetraviss.uk
+- **Package Page**: https://pypi.rosetraviss.uk/asn1
+- **Primary Host**: https://pypi.rosetraviss.uk
+
+## API Endpoints
+
+### `POST /api/encode`
+Encodes a given value into ASN.1 hex representation.
+
+#### Request Body
+- `type` (string): The data type to encode (`UTF8String`, `Integer`, `Boolean`).
+- `value` (string): The value to encode.
+
+#### Response Body
+- `hex` (string): The ASN.1 hex encoded representation.
+- `error` (string, optional): Error message if encoding fails.
+
+### `POST /api/decode`
+Decodes an ASN.1 hex string into its tag and value.
+
+#### Request Body
+- `hex` (string): The hex string to decode.
+
+#### Response Body
+- `tag` (string): The decoded ASN.1 tag information.
+- `value` (string): The decoded value.
+- `error` (string, optional): Error message if decoding fails.
+"""
+
 HTML_CONTENT = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASN.1 Demo</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
+    <link rel="icon" href="/favicon.ico" type="image/svg+xml">
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -219,7 +255,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 if (data.error) {
                     showResult(`Error: ${data.error}`, true);
                 } else {
-                    showResult(`Decoded Tag: ${data.tag}\nDecoded Value: ${data.value}`);
+                    showResult(`Decoded Tag: ${data.tag}\\nDecoded Value: ${data.value}`);
                 }
             } catch (err) {
                 showResult(`Error: ${err.message}`, true);
@@ -291,40 +327,54 @@ def to_js_headers(d):
         h.set(k, v)
     return h
 
-async def on_fetch(request):
-    url = request.url
+async def on_fetch(request, env=None):
+    url_str = str(request.url)
+    path = url_str.split("?")[0]
+    if "://" in path:
+        path = "/" + path.split("/", 3)[-1]
+
     method = request.method
 
-    headers = to_js_headers({"content-type": "application/json"})
+    headers = to_js_headers({"content-type": "application/json", "Access-Control-Allow-Origin": "*"})
     html_headers = to_js_headers({"content-type": "text/html; charset=utf-8"})
+    text_headers = to_js_headers({"content-type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"})
+    icon_headers = to_js_headers({"content-type": "image/svg+xml", "Cache-Control": "public, max-age=86400"})
 
     try:
+        if path == "/llms.txt" or path == "/llms-full.txt":
+            return Response.new(LLMS_TXT, headers=text_headers)
+
+        if path == "/favicon.ico":
+            return Response.new(FAVICON_SVG, headers=icon_headers)
+
         # Route: GET /
-        if method == "GET" and (url.endswith("/") or url.endswith("/index.html")):
-            return Response.new(HTML_CONTENT, {"headers": html_headers})
+        if method == "GET" and (path == "/" or path == "/index.html"):
+            return Response.new(HTML_CONTENT, headers=html_headers)
 
         # Route: POST /api/encode
-        elif method == "POST" and url.endswith("/api/encode"):
+        elif method == "POST" and path == "/api/encode":
             req_body = await request.text()
             data = json.loads(req_body) if req_body else {}
             result = handle_encode(data)
-            return Response.new(json.dumps(result), {"headers": headers})
+            return Response.new(json.dumps(result), headers=headers)
 
         # Route: POST /api/decode
-        elif method == "POST" and url.endswith("/api/decode"):
+        elif method == "POST" and path == "/api/decode":
             req_body = await request.text()
             data = json.loads(req_body) if req_body else {}
             result = handle_decode(data)
-            return Response.new(json.dumps(result), {"headers": headers})
+            return Response.new(json.dumps(result), headers=headers)
 
         # 404
         else:
             return Response.new(
                 json.dumps({"error": "Not Found"}),
-                {"headers": headers, "status": 404}
+                headers=headers,
+                status=404
             )
     except Exception as e:
         return Response.new(
             json.dumps({"error": "Internal Server Error", "details": str(e)}),
-            {"headers": headers, "status": 500}
+            headers=headers,
+            status=500
         )
