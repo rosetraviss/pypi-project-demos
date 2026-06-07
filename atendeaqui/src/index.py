@@ -210,9 +210,10 @@ class AsyncMockHttpClient(HttpClient):
         # Simulate /v1/onboarding/flows/{flow_key}/start
         if "onboarding/flows" in path and path.endswith("/start"):
             flow_key = path.split("/")[-2]
+            payload = json or {}
             return {
-                "external_user_id": json.get("user_id"),
-                "external_user_name": json.get("name"),
+                "external_user_id": payload.get("user_id"),
+                "external_user_name": payload.get("name"),
                 "external_user_email": None,
                 "flow_name": "Demo Flow",
                 "flow_slug": "demo-flow",
@@ -261,6 +262,8 @@ async def handle_start_flow(request):
     try:
         req_json = await request.json()
         req_dict = req_json.to_py()
+        if not isinstance(req_dict, dict):
+            return json_response({"error": "Invalid JSON payload structure"}, status=400)
     except Exception:
         return json_response({"error": "Invalid JSON"}, status=400)
 
@@ -299,18 +302,8 @@ async def handle_start_flow(request):
 # ==============================================================================
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = url.split("?")[0]
-
-    if "://" in path:
-        path = "/" + path.split("/", 3)[-1]
-
-    if path == "/llms.txt" or path == "/llms-full.txt":
-        headers = Headers.new([
-            ("Content-Type", "text/plain; charset=utf-8"),
-            ("Access-Control-Allow-Origin", "*")
-        ])
-        return Response.new(LLMS_TXT, headers=headers)
+    from urllib.parse import urlparse
+    path = urlparse(request.url).path or "/"
 
     if path == "/favicon.ico":
         headers = Headers.new([

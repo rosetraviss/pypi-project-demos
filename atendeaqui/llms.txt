@@ -1,7 +1,0 @@
-# AtendeAqui Cloudflare Worker Demo
-
-This repository contains a demo for the `atendeaqui` Python package, running inside a Cloudflare Python Worker via Pyodide.
-
-Since Cloudflare Workers do not support synchronous socket-based requests (used by the `requests` library), this demo intercepts the SDK's internal `HttpClient` and mocks the responses to showcase the API without actual network calls.
-
-The worker serves an HTML interface to interact with the mocked API.
