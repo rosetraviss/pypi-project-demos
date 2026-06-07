@@ -5,40 +5,6 @@ import traceback
 
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📦</text></svg>"""
 
-LLMS_TXT = """# ASN.1 Demo API
-
-> Live demo API and UI for the `asn1` package on Cloudflare Workers, providing a web interface to encode and decode ASN.1 data types.
-
-## Deployment Details
-- **Demo URL**: https://asn1.pypi.rosetraviss.uk
-- **Package Page**: https://pypi.rosetraviss.uk/asn1
-- **Primary Host**: https://pypi.rosetraviss.uk
-
-## API Endpoints
-
-### `POST /api/encode`
-Encodes a given value into ASN.1 hex representation.
-
-#### Request Body
-- `type` (string): The data type to encode (`UTF8String`, `Integer`, `Boolean`).
-- `value` (string): The value to encode.
-
-#### Response Body
-- `hex` (string): The ASN.1 hex encoded representation.
-- `error` (string, optional): Error message if encoding fails.
-
-### `POST /api/decode`
-Decodes an ASN.1 hex string into its tag and value.
-
-#### Request Body
-- `hex` (string): The hex string to decode.
-
-#### Response Body
-- `tag` (string): The decoded ASN.1 tag information.
-- `value` (string): The decoded value.
-- `error` (string, optional): Error message if decoding fails.
-"""
-
 HTML_CONTENT = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,64 +12,93 @@ HTML_CONTENT = """<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASN.1 Demo</title>
     <link rel="icon" href="/favicon.ico" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f4f4f9;
-            --text-color: #333;
-            --accent-color: #007bff;
-            --container-bg: #fff;
-            --border-color: #ddd;
+            --bg-color: #f7f9ff;
+            --text-color: #001d32;
+            --accent-color: #145d91;
+            --accent-hover: #3776ab;
+            --container-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --muted-color: #41474f;
+            
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-sans);
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 48px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
         h1 {
-            margin-bottom: 5px;
+            font-family: var(--font-mono);
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 44px;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
         }
         .subtitle {
-            color: #666;
-            margin-bottom: 20px;
+            color: var(--muted-color);
+            margin-bottom: 32px;
+            font-size: 16px;
         }
         .container {
             background: var(--container-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
             max-width: 600px;
             width: 100%;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .container:hover {
-            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(31, 66, 94, 0.08);
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            font-size: 12px;
             font-weight: 600;
+            line-height: 16px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--muted-color);
+            margin-bottom: 8px;
         }
         select, input[type="text"], textarea {
             width: 100%;
-            padding: 10px;
+            padding: 10px 14px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 4px;
             box-sizing: border-box;
-            font-family: inherit;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            background-color: #f8fafc;
+            color: var(--text-color);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        select:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(20, 93, 145, 0.15);
         }
         textarea {
             resize: vertical;
             height: 100px;
-            font-family: monospace;
+            font-family: var(--font-mono);
+            font-size: 13px;
         }
         .button-group {
             display: flex;
@@ -114,54 +109,60 @@ HTML_CONTENT = """<!DOCTYPE html>
             flex: 1;
             padding: 12px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             background-color: var(--accent-color);
             color: white;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.1s;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: var(--accent-hover);
         }
         button:active {
             transform: scale(0.98);
         }
         button.secondary {
-            background-color: #6c757d;
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
         }
         button.secondary:hover {
-            background-color: #5a6268;
+            background-color: rgba(20, 93, 145, 0.05);
         }
         .result-container {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 6px;
+            padding: 16px;
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             word-break: break-all;
             min-height: 50px;
-            font-family: monospace;
+            font-family: var(--font-mono);
+            font-size: 13px;
             opacity: 0;
+            color: var(--text-color);
             transition: opacity 0.3s ease-in-out;
         }
         .result-container.show {
             opacity: 1;
         }
         footer {
-            margin-top: auto;
-            padding: 20px 0;
+            margin-top: 40px;
+            padding: 24px 0 0;
             text-align: center;
-            font-size: 0.9em;
-            color: #777;
+            font-size: 14px;
+            color: var(--muted-color);
+            width: 100%;
+            border-top: 1px solid var(--border-color);
         }
         footer a {
             color: var(--accent-color);
             text-decoration: none;
-            transition: color 0.2s;
+            font-weight: 600;
         }
         footer a:hover {
-            color: #0056b3;
             text-decoration: underline;
         }
     </style>
@@ -343,9 +344,6 @@ async def on_fetch(request, env=None):
     icon_headers = to_js_headers({"content-type": "image/svg+xml", "Cache-Control": "public, max-age=86400"})
 
     try:
-        if path == "/llms.txt" or path == "/llms-full.txt":
-            return Response.new(LLMS_TXT, headers=text_headers)
-
         if path == "/favicon.ico":
             return Response.new(FAVICON_SVG, headers=icon_headers)
 
