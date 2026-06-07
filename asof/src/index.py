@@ -446,7 +446,8 @@ async def handle_asof(query: dict):
         return json_response({"error": str(e)}, status=400)
     except Exception as e:
         import traceback
-        return json_response({"error": str(e), "traceback": traceback.format_exc()}, status=500)
+        print(f"Error handling request: {e}\n{traceback.format_exc()}")
+        return json_response({"error": "An unexpected error occurred while processing your request."}, status=500)
 
 async def on_fetch(request, env):
     url = str(request.url)
