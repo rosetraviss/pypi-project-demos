@@ -219,4 +219,6 @@ __marimo__/
 
 node_modules
 .wrangler
+
 python_modules/
+async-mega.py/python_modules/
