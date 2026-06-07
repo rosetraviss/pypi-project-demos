@@ -1,0 +1,13 @@
+asyncio_extensions-0.2.0.dist-info/INSTALLER,sha256=5hhM4Q4mYTT9z6QB6PGpUAW81PGNFrYrdXMj4oM_6ak,2
+asyncio_extensions-0.2.0.dist-info/METADATA,sha256=sJ47E3wIv1a4nOVyfScr1l71PkmRqlFtyjIBGO6rRNs,13363
+asyncio_extensions-0.2.0.dist-info/RECORD,,
+asyncio_extensions-0.2.0.dist-info/REQUESTED,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
+asyncio_extensions-0.2.0.dist-info/WHEEL,sha256=QccIxa26bgl1E6uMy58deGWi-0aeIkkangHcxk2kWfw,87
+asyncio_extensions-0.2.0.dist-info/licenses/LICENSE.txt,sha256=9MhvrEwVOMUhmjtwqlza75RnD32B8zRvqNygMxjI2YI,1131
+asyncio_extensions/__init__.py,sha256=4X0KaQE5OUtvknFZDuQepYBJkVfD08iX8hoV4_Bdz04,1200
+asyncio_extensions/_compat.py,sha256=JPwxz9V8nMIQSsHogb8LB32qun5xIh9I4PeYS6gndus,1321
+asyncio_extensions/_iterators.py,sha256=z7WAOV56h1kuc9bRBG90ZXGv-_cnp59G3tNBdZj2gjw,6614
+asyncio_extensions/_scheduling.py,sha256=EQVG2XPVMdp5XfR7qfaxW4ctVSLffcncnmy-6xqgOjA,1260
+asyncio_extensions/_sync.py,sha256=Clmaxj60GIDFyrGM4v-bWo6zA46_W1oxLMraXMXgxX4,3009
+asyncio_extensions/_task_groups.py,sha256=NaHGo-NqpDw6wJcRgd5nn7TvnqH2e1Nz1ikQtfA0aYM,2242
+asyncio_extensions/py.typed,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
