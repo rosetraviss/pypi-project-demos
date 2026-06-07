@@ -219,3 +219,12 @@ __marimo__/
 
 node_modules
 .wrangler
+
+python_modules/
+
+
+# Ignore local python_modules directory for Pyodide worker deps
+**/python_modules/
+!**/src/
+!**/wrangler.toml
+!**/pyproject.toml

@@ -1,0 +1,12 @@
+[project]
+name = "atriumsports-sdk-demo"
+version = "0.1.0"
+description = "Demo for the atriumsports_sdk package running in Cloudflare Python Workers"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "atriumsports_sdk",
+]
+
+[tool.uv]
+package = false
