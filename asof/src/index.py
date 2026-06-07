@@ -354,6 +354,10 @@ async def handle_asof(query: dict):
     if not pkg:
         return json_response({"error": "Missing 'package' parameter"}, status=400)
 
+    import re
+    if not re.match(r"^[a-zA-Z0-9-_.]+$", pkg):
+        return json_response({"error": "Invalid package name format"}, status=400)
+
     if not date_str:
         return json_response({"error": "Missing 'date' parameter (format: YYYY-MM-DD)"}, status=400)
 
