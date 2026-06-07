@@ -1,0 +1,13 @@
+{
+  "name": "aspish-demo",
+  "version": "0.1.0",
+  "description": "aspish Cloudflare Worker Demo",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

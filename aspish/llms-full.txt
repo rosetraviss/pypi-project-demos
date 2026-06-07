@@ -1,0 +1,6 @@
+# aspish Demo Full Info
+
+A demonstration of the `aspish` Python package running within a Cloudflare Worker. Provides an interactive frontend to input family parent relationships and uses `aspish` (ASP - Answer Set Programming) to compute siblings.
+
+PyPI: https://pypi.org/project/aspish/
+Homepage: https://pypi.rosetraviss.uk
