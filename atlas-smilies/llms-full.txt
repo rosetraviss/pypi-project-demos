@@ -1,0 +1,19 @@
+# atlas-smilies Demo API
+
+> Live demo API and UI for the `atlas-smilies` package on Cloudflare Workers, providing multi-omic trajectory inference features (simulated due to Pyodide limitations).
+
+## Deployment Details
+- **Demo URL**: https://atlas-smilies.pypi.rosetraviss.uk
+- **Package Page**: https://pypi.rosetraviss.uk/atlas-smilies
+- **Primary Host**: https://pypi.rosetraviss.uk
+
+## API Endpoints
+
+### `GET /api/info`
+Returns general metadata about the package and the worker environment.
+
+### `GET /api/trajectory`
+Simulates a multi-omic trajectory inference to showcase the theoretical usage of the package, returning mock results since the underlying package relies on native C-extensions (like anndata and scanpy) that cannot be executed in Pyodide.
+
+#### Limitations
+Cloudflare Workers execute Python code using Pyodide, which does not support native C-extensions. Since `atlas-smilies` relies on packages with such extensions, the worker handles the `ImportError` gracefully and returns simulated outputs for the demo.
