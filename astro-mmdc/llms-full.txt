@@ -1,0 +1,11 @@
+# astro-mmdc Demo Detailed Information
+
+A Cloudflare Python Worker demonstrating the `astro-mmdc` package capabilities.
+
+This simple demo provides a web interface with endpoints to use the `astro-mmdc` package, allowing query and simple modeling operations. The API endpoints interact with the `astro_mmdc` python module to perform cone searches for observations and generate emission modeling simulations.
+
+Endpoints typically exposed:
+- `/api/query`: Endpoint to run cone searches using RA and DEC coordinates.
+- `/api/model`: Endpoint to run synchronous model inference (e.g., SSC type).
+
+Local Development uses: `npx wrangler dev`
