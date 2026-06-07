@@ -219,8 +219,4 @@ __marimo__/
 
 node_modules
 .wrangler
-
-async-requests-tls/python_modules/*
-!async-requests-tls/src/
-!async-requests-tls/wrangler.toml
-!async-requests-tls/pyproject.toml
+python_modules/
