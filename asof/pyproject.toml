@@ -1,0 +1,13 @@
+[project]
+name = "asof-demo"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "asof>=0.1.2",
+]
+
+[dependency-groups]
+dev = [
+    "workers-py",
+    "workers-runtime-sdk",
+]
