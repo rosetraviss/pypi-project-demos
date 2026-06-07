@@ -366,6 +366,27 @@ async def handle_asof(query: dict):
 
         # Call the PyPI API directly using pyfetch
         from pyodide.http import pyfetch
+        import sys
+        from types import ModuleType
+        
+        # Mock rich.status to prevent thread creation which is unsupported in Cloudflare Pyodide Workers
+        class DummyStatus:
+            def __init__(self, *args, **kwargs): pass
+            def __enter__(self): return self
+            def __exit__(self, *args, **kwargs): pass
+            def start(self): pass
+            def stop(self): pass
+            
+        rich_status = ModuleType("rich.status")
+        rich_status.Status = DummyStatus
+        sys.modules["rich.status"] = rich_status
+
+        # Mock subprocess.run to raise FileNotFoundError as subprocesses are not supported in WebAssembly/Pyodide
+        import subprocess
+        def mock_run(*args, **kwargs):
+            raise FileNotFoundError("Subprocesses are not supported in Emscripten/Pyodide")
+        subprocess.run = mock_run
+
         import asof
         import json
         from collections import defaultdict
