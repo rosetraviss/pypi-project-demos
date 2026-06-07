@@ -10,33 +10,40 @@ HTML = """<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>asof - Historical Package Lookup</title>
+  <link rel="icon" href="/favicon.ico" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #fafafa;
-      --fg: #111;
-      --accent: #2563eb;
-      --card-bg: #fff;
-      --border: #e5e5e5;
-      --muted: #666;
-      --error: #ef4444;
-      --success: #10b981;
+      --primary: #145d91;
+      --primary-hover: #3776ab;
+      --bg: #f7f9ff;
+      --fg: #001d32;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --muted: #41474f;
+      --error: #ba1a1a;
+      --success: #316600;
+      
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: var(--font-sans);
       background-color: var(--bg);
       color: var(--fg);
       line-height: 1.5;
-      margin: 0;
       padding: 0;
     }
 
     .container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 48px 24px;
     }
 
     header {
@@ -45,14 +52,19 @@ HTML = """<!DOCTYPE html>
     }
 
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      letter-spacing: -0.05em;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 44px;
+      letter-spacing: -0.02em;
+      font-family: var(--font-mono);
+      color: var(--fg);
+      margin-bottom: 8px;
     }
 
     .subtitle {
       color: var(--muted);
-      font-size: 1.1rem;
+      font-size: 16px;
+      line-height: 24px;
       max-width: 600px;
       margin: 0 auto;
     }
@@ -60,10 +72,22 @@ HTML = """<!DOCTYPE html>
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-      margin-bottom: 30px;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(31, 66, 94, 0.08);
+    }
+    
+    .card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 28px;
+      margin-bottom: 16px;
+      font-family: var(--font-sans);
     }
 
     .form-group {
@@ -72,40 +96,48 @@ HTML = """<!DOCTYPE html>
 
     label {
       display: block;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
       margin-bottom: 8px;
     }
 
     input[type="text"], input[type="date"] {
       width: 100%;
-      padding: 12px 16px;
-      font-size: 1rem;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: var(--font-sans);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 4px;
+      background-color: #f8fafc;
+      color: var(--fg);
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     input:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(20, 93, 145, 0.15);
     }
 
     button {
-      background: var(--accent);
+      background: var(--primary);
       color: white;
       border: none;
       padding: 12px 24px;
-      font-size: 1rem;
-      font-weight: 500;
-      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 4px;
       cursor: pointer;
       width: 100%;
       transition: background-color 0.2s, transform 0.1s;
     }
 
     button:hover {
-      background: #1d4ed8;
+      background: var(--primary-hover);
     }
 
     button:active {
@@ -113,14 +145,14 @@ HTML = """<!DOCTYPE html>
     }
 
     button:disabled {
-      background: #93c5fd;
+      background: #98cbff;
       cursor: not-allowed;
     }
 
     .result-container {
       margin-top: 24px;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 4px;
       background: #f8fafc;
       border: 1px solid var(--border);
       display: none;
@@ -138,6 +170,7 @@ HTML = """<!DOCTYPE html>
       justify-content: space-between;
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
+      font-size: 14px;
     }
 
     .result-item:last-child {
@@ -150,25 +183,27 @@ HTML = """<!DOCTYPE html>
     }
 
     .result-value {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-family: var(--font-mono);
       font-weight: 600;
+      color: var(--fg);
     }
 
     .error-msg {
       color: var(--error);
       padding: 12px;
-      background: #fef2f2;
-      border-radius: 6px;
-      border: 1px solid #fecaca;
+      background: #ffdad6;
+      border-radius: 4px;
+      border: 1px solid var(--border);
       display: none;
       margin-top: 16px;
+      font-size: 14px;
     }
 
     .spinner {
       display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
       border-radius: 50%;
       border-top-color: white;
       animation: spin 1s ease-in-out infinite;
@@ -183,15 +218,16 @@ HTML = """<!DOCTYPE html>
     footer {
       text-align: center;
       margin-top: 60px;
-      padding-top: 20px;
+      padding-top: 24px;
       border-top: 1px solid var(--border);
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 14px;
     }
 
     footer a {
-      color: var(--accent);
+      color: var(--primary);
       text-decoration: none;
+      font-weight: 600;
     }
 
     footer a:hover {
@@ -236,15 +272,15 @@ HTML = """<!DOCTYPE html>
         </div>
         <div class="result-item" style="display: flex; flex-direction: column; align-items: flex-start;">
            <span class="result-label">Source</span>
-           <span class="result-value" id="res-source" style="font-size: 0.85em; margin-top: 4px; word-break: break-all; font-weight: normal; color: var(--accent);"></span>
+           <span class="result-value" id="res-source" style="font-size: 0.85em; margin-top: 4px; word-break: break-all; font-weight: normal; color: var(--primary);"></span>
         </div>
       </div>
     </div>
 
     <div class="card">
       <h3>API Usage</h3>
-      <p>You can also use this service via an API endpoint:</p>
-      <pre style="background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow-x: auto;"><code>curl "https://asof.pypi.rosetraviss.uk/api/asof?package=requests&date=2021-01-01"</code></pre>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">You can also use this service via an API endpoint:</p>
+      <pre style="background: #f8fafc; color: #001d32; border: 1px solid var(--border); padding: 14px 16px; border-radius: 8px; overflow-x: auto; font-family: var(--font-mono); font-size: 14px; line-height: 22px;"><code>curl "https://asof.pypi.rosetraviss.uk/api/asof?package=requests&date=2021-01-01"</code></pre>
     </div>
 
     <footer>

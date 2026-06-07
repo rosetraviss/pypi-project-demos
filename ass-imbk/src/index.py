@@ -7,15 +7,6 @@ import ass
 
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎬</text></svg>"""
 
-LLMS_TXT = """# ass-imbk Demo API
-Demo for `ass-imbk` running as a Cloudflare Python Worker.
-"""
-
-LLMS_FULL_TXT = """# ass-imbk Demo API
-Demo for `ass-imbk` running as a Cloudflare Python Worker.
-Developed by contributors of https://pypi.rosetraviss.uk.
-"""
-
 FOOTER_HTML = """
 <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: var(--muted);">
     <p>Powered by <a href="https://pypi.rosetraviss.uk/project/ass-imbk/" target="_blank" style="color: var(--blue);">ass-imbk</a></p>
@@ -35,68 +26,69 @@ HTML = f"""<!DOCTYPE html>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {{
-      --bg:        #07090e;
-      --surface:   #0d1017;
-      --surface2:  #141820;
-      --border:    rgba(255,255,255,0.07);
-      --accent:    #8b5cf6;
-      --accent2:   #6366f1;
-      --blue:      #3b82f6;
-      --green:     #10b981;
-      --text:      #e4e8f0;
-      --muted:     #8b949e;
+      --primary: #145d91;
+      --primary-hover: #3776ab;
+      --bg: #f7f9ff;
+      --fg: #001d32;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --border: #e2e8f0;
+      --muted: #41474f;
+      --error: #ba1a1a;
+      --success: #316600;
+      
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }}
-    * {{ box-sizing: border-box; }}
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
-      margin: 0; font-family: 'Inter', sans-serif;
-      background-color: var(--bg); color: var(--text);
+      font-family: var(--font-sans);
+      background-color: var(--bg); color: var(--fg);
       line-height: 1.5; padding-bottom: 60px;
     }}
     .container {{
-      max-width: 800px; margin: 0 auto; padding: 40px 20px;
+      max-width: 800px; margin: 0 auto; padding: 48px 24px;
     }}
     header {{
       text-align: center; margin-bottom: 40px;
-      animation: fadeInDown 0.6s ease-out;
     }}
     h1 {{
-      font-size: 2.5rem; font-weight: 800; margin: 0;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 36px; font-weight: 700; line-height: 44px; letter-spacing: -0.02em; margin: 0;
+      font-family: var(--font-mono); color: var(--fg);
     }}
-    .subtitle {{ color: var(--muted); margin-top: 8px; font-size: 1.1rem; }}
+    .subtitle {{ color: var(--muted); margin-top: 8px; font-size: 16px; }}
     .panel {{
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 24px; margin-bottom: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      border-radius: 8px; padding: 24px; margin-bottom: 24px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }}
-    .panel:hover {{ transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }}
+    .panel:hover {{ box-shadow: 0 4px 12px rgba(31, 66, 94, 0.08); }}
 
     .upload-zone {{
       border: 2px dashed var(--border);
-      border-radius: 8px;
+      border-radius: 4px;
       padding: 40px;
       text-align: center;
       cursor: pointer;
+      background: var(--surface2);
       transition: all 0.2s;
     }}
     .upload-zone:hover, .upload-zone.dragover {{
-      border-color: var(--accent);
-      background: var(--surface2);
+      border-color: var(--primary);
+      background: var(--bg);
     }}
     .upload-zone input[type="file"] {{ display: none; }}
 
     .btn {{
-      display: inline-block; padding: 10px 20px; border-radius: 6px;
-      border: none; background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: inline-block; padding: 10px 20px; border-radius: 4px;
+      border: none; background: var(--primary);
       color: #fff; font-weight: 600; font-family: inherit; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      font-size: 1rem;
+      transition: background-color 0.2s, transform 0.1s;
+      font-size: 14px;
     }}
-    .btn:hover {{ opacity: 0.9; }}
+    .btn:hover {{ background: var(--primary-hover); }}
     .btn:active {{ transform: scale(0.98); }}
-    .btn:disabled {{ opacity: 0.5; cursor: not-allowed; }}
+    .btn:disabled {{ background: #98cbff; cursor: not-allowed; }}
 
     .result {{ display: none; margin-top: 24px; }}
     .result.show {{ display: block; animation: fadeIn 0.4s ease-out; }}
@@ -105,25 +97,25 @@ HTML = f"""<!DOCTYPE html>
       display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;
     }}
     .data-card {{
-      background: var(--surface2); padding: 16px; border-radius: 8px;
+      background: var(--surface2); padding: 16px; border-radius: 4px;
       border: 1px solid var(--border);
     }}
-    .data-card h3 {{ margin: 0 0 8px 0; font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }}
-    .data-card p {{ margin: 0; font-size: 1.25rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; }}
+    .data-card h3 {{ margin: 0 0 8px 0; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }}
+    .data-card p {{ margin: 0; font-size: 18px; font-weight: 600; font-family: var(--font-mono); color: var(--fg); }}
 
     .events-list {{
       margin-top: 24px; max-height: 300px; overflow-y: auto;
-      border: 1px solid var(--border); border-radius: 8px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 4px; background: var(--surface2);
     }}
     .event-row {{
       padding: 12px 16px; border-bottom: 1px solid var(--border);
-      display: flex; gap: 16px;
+      display: flex; gap: 16px; font-size: 14px;
     }}
     .event-row:last-child {{ border-bottom: none; }}
-    .event-time {{ color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; width: 160px; flex-shrink: 0; }}
-    .event-text {{ font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
+    .event-time {{ color: var(--muted); font-family: var(--font-mono); font-size: 12px; width: 160px; flex-shrink: 0; }}
+    .event-text {{ font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg); }}
 
-    .error-msg {{ color: #f87171; background: rgba(248,113,113,0.1); padding: 12px; border-radius: 6px; margin-top: 16px; display: none; border: 1px solid rgba(248,113,113,0.2); }}
+    .error-msg {{ color: var(--error); background: #ffdad6; padding: 12px; border-radius: 4px; margin-top: 16px; display: none; border: 1px solid var(--border); font-size: 14px; }}
 
     @keyframes fadeInDown {{ from {{ opacity: 0; transform: translateY(-10px); }} to {{ opacity: 1; transform: translateY(0); }} }}
     @keyframes fadeIn {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
@@ -389,12 +381,6 @@ async def on_fetch(request, env):
             "Access-Control-Allow-Headers": "Content-Type",
         }.items())
         return Response.new("", headers=headers)
-
-    if path == "/llms.txt":
-        return text_response(LLMS_TXT)
-
-    if path == "/llms-full.txt":
-        return text_response(LLMS_FULL_TXT)
 
     if path == "/favicon.ico":
         return text_response(FAVICON_SVG, "image/svg+xml")
