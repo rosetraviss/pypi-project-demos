@@ -7,33 +7,6 @@ import abbrev
 # Documentation & Assets
 # ─────────────────────────────────────────────────────────────────────────────
 
-LLMS_TXT = """# abbrev Demo API
-
-> Live demo API and UI for the pure-Python `abbrev` package on Cloudflare Workers, resolving shortest unique abbreviation mappings.
-
-## Deployment Details
-- **Demo URL**: https://abbrev.pypi.rosetraviss.uk
-- **Package Page**: https://pypi.rosetraviss.uk/abbrev
-- **Primary Host**: https://pypi.rosetraviss.uk
-
-## API Endpoint
-
-### `POST /api/abbrev`
-Computes abbreviations for a list of words, with optional query lookups.
-
-#### Request Body
-- `words` (array of strings, required): A list of words to calculate abbreviations for.
-- `query` (string, optional): A specific query to look up.
-- `multi` (boolean, optional, default `false`): If `true`, returns all matches.
-- `unique` (boolean, optional, default `true`): If `true`, checks for uniqueness.
-
-#### Response Body
-- `shortest_mapping` (object): Map of each input word to its shortest unique abbreviation.
-- `full_mapping` (object): Map of all valid abbreviation prefixes to their resolved words.
-- `query_result` (any, optional): Result of looking up the `query` parameter.
-- `query_error` (string, optional): Error message if query lookup fails (e.g. key is ambiguous).
-"""
-
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🐜</text></svg>"""
 
 
@@ -114,91 +87,100 @@ HTML = r"""<!DOCTYPE html>
   <meta name="description" content="Calculate and visualize shortest unique abbreviations for lists of words, powered by the pure-Python abbrev package on Cloudflare Workers.">
   <link rel="icon" href="/favicon.ico" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #06080c;
-      --surface:   #0b0f17;
-      --surface2:  #111724;
-      --border:    rgba(255, 255, 255, 0.08);
-      --accent:    #a855f7; /* Purple */
-      --accent-rgb: 168, 85, 247;
-      --accent2:   #ec4899; /* Pink */
-      --accent2-rgb: 236, 72, 153;
-      --green:     #10b981;
-      --red:       #ef4444;
-      --text:      #f3f4f6;
-      --muted:     #9ca3af;
-      --radius:    16px;
+      --bg:        #f7f9ff;
+      --surface:   #ffffff;
+      --surface2:  #f8fafc;
+      --border:    #e2e8f0;
+      --accent:    #145d91; /* Primary Blue */
+      --accent-hover: #3776ab;
+      --accent2:   #ffd43b; /* Secondary Yellow */
+      --green:     #316600; /* Success Tertiary */
+      --red:       #ba1a1a; /* Error */
+      --text:      #001d32;
+      --muted:     #41474f;
+      
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-
-    /* ── Ambient Orbs ── */
-    .orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .orb  { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; }
-    .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(var(--accent-rgb), 0.6), transparent 70%); top: -200px; left: -100px; animation: float 18s ease-in-out infinite alternate; }
-    .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(var(--accent2-rgb), 0.6), transparent 70%); bottom: -150px; right: -50px; animation: float 22s ease-in-out infinite alternate-reverse; }
-    @keyframes float { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,40px) scale(1.1); } }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
     /* ── Layout ── */
-    .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+    .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 48px 24px; }
     
     /* ── Header ── */
     header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 40px; }
     .brand { display: flex; align-items: center; gap: 12px; }
-    .logo { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 24px; letter-spacing: -0.02em; }
+    .logo { color: var(--accent); font-weight: 800; font-size: 24px; letter-spacing: -0.02em; font-family: var(--font-mono); }
     .badges { display: flex; gap: 8px; }
-    .badge { border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-    .badge-cf { background: rgba(var(--accent-rgb), 0.15); border: 1px solid rgba(var(--accent-rgb), 0.3); color: var(--accent); }
-    .badge-pypi { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--muted); text-decoration: none; transition: all 0.2s; }
-    .badge-pypi:hover { border-color: var(--accent2); color: var(--accent2); }
+    .badge { border-radius: 4px; padding: 6px 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-cf { background: rgba(20, 93, 145, 0.1); border: 1px solid rgba(20, 93, 145, 0.2); color: var(--accent); }
+    .badge-pypi { background: var(--surface); border: 1px solid var(--border); color: var(--muted); text-decoration: none; transition: all 0.2s; }
+    .badge-pypi:hover { border-color: var(--accent); color: var(--accent); }
 
     /* ── Hero ── */
     .hero { text-align: center; margin-bottom: 48px; }
-    h1 { font-size: clamp(32px, 5vw, 64px); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 16px; }
-    h1 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero-sub { font-size: 18px; color: var(--muted); max-width: 680px; margin: 0 auto; line-height: 1.6; }
-    .hero-sub code { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 0.9em; background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 4px; }
+    h1 { font-size: clamp(32px, 5vw, 64px); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 16px; color: var(--text); }
+    h1 span { color: var(--accent); }
+    .hero-sub { font-size: 16px; color: var(--muted); max-width: 680px; margin: 0 auto; line-height: 1.6; }
+    .hero-sub code { font-family: var(--font-mono); color: var(--accent); font-size: 0.9em; background: rgba(20, 93, 145, 0.05); padding: 2px 6px; border-radius: 4px; }
 
     /* ── Grid Layout ── */
     .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
     /* ── Card Styles ── */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
-    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0.8; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+    .card:hover { box-shadow: 0 4px 12px rgba(31, 66, 94, 0.08); }
     .card-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
     .card-desc { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
 
     /* ── Inputs & Forms ── */
     label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; }
-    textarea, input[type="text"] { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    textarea:focus, input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15); }
-    textarea { resize: vertical; min-height: 120px; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+    textarea, input[type="text"] { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 12px 16px; color: var(--text); font-family: var(--font-sans); font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    textarea:focus, input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(20, 93, 145, 0.15); }
+    textarea { resize: vertical; min-height: 120px; font-family: var(--font-mono); font-size: 14px; }
 
     /* ── Shortest Abbrevs Results ── */
     .word-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-    .word-item { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; justify-content: space-between; }
+    .word-item { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 10px 16px; justify-content: space-between; }
     .orig-word { font-weight: 600; font-size: 15px; }
-    .abbrev-tag { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; color: var(--green); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 6px; }
-    .abbrev-highlight { color: var(--accent2); text-decoration: underline; text-underline-offset: 4px; }
+    .abbrev-tag { font-family: var(--font-mono); font-weight: 700; font-size: 13px; color: var(--green); background: rgba(49, 102, 0, 0.08); border: 1px solid rgba(49, 102, 0, 0.15); padding: 4px 10px; border-radius: 4px; }
+    .abbrev-highlight { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
 
     /* ── Playback Sandbox ── */
-    .sandbox-result { margin-top: 16px; padding: 16px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 14px; border: 1px solid var(--border); background: var(--surface2); }
-    .result-success { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.03); color: var(--green); }
-    .result-ambiguous { border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.03); color: var(--red); }
+    .sandbox-result { margin-top: 16px; padding: 16px; border-radius: 4px; font-family: var(--font-mono); font-size: 14px; border: 1px solid var(--border); background: var(--surface2); }
+    .result-success { border-color: rgba(49, 102, 0, 0.3); background: rgba(49, 102, 0, 0.03); color: var(--green); }
+    .result-ambiguous { border-color: rgba(186, 26, 26, 0.3); background: rgba(186, 26, 26, 0.03); color: var(--red); }
     .result-error { border-color: var(--border); background: var(--surface2); color: var(--muted); }
 
     /* ── API Documentation Panel ── */
     .api-section { margin-top: 40px; }
-    pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; color: #e5e7eb; }
-    .kw { color: #f472b6; }
-    .st { color: #34d399; }
-    .nm { color: #fb923c; }
-    .cm { color: #6b7280; font-style: italic; }
+    pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 18px; font-family: var(--font-mono); font-size: 14px; line-height: 22px; overflow-x: auto; color: var(--text); }
+    .kw { color: #8b5cf6; }
+    .st { color: var(--green); }
+    .nm { color: #d97706; }
+    .cm { color: var(--muted); font-style: italic; }
+
+    /* ── Navigation Tabs ── */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .tab-btn { background: none; border: none; color: var(--muted); font-family: var(--font-sans); font-size: 14px; font-weight: 600; padding: 8px 16px; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
+    .tab-btn:hover { color: var(--text); background: rgba(20, 93, 145, 0.05); }
+    .tab-btn.active { color: var(--accent); background: rgba(20, 93, 145, 0.1); border: 1px solid rgba(20, 93, 145, 0.2); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── Footer ── */
+    footer { text-align: center; margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+    footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-decoration: underline; }
+  </style>tyle: italic; }
 
     /* ── Navigation Tabs ── */
     .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
@@ -443,10 +425,6 @@ async def on_fetch(request, env):
     # Normalise path: strip protocol+host
     if "://" in path:
         path = "/" + path.split("/", 3)[-1]
-
-    if path == "/llms.txt" or path == "/llms-full.txt":
-        headers = Headers.new({"Content-Type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"}.items())
-        return Response.new(LLMS_TXT, headers=headers)
 
     if path == "/favicon.ico":
         headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
