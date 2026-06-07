@@ -377,11 +377,11 @@ async def handle_solve(request):
         for p in parents:
             if not isinstance(p, dict):
                 return json_response({"error": "Each parent entry must be an object"}, status=400)
-            name = p.get("name")
-            child = p.get("child")
+            name = str(p.get("name", "")).strip()
+            child = str(p.get("child", "")).strip()
             if not name or not child:
                 return json_response({"error": "Each parent entry must have non-empty 'name' and 'child'"}, status=400)
-            validated_parents.append({"name": str(name), "child": str(child)})
+            validated_parents.append({"name": name, "child": child})
 
         siblings = solve_siblings(validated_parents)
         return json_response({"siblings": siblings})
