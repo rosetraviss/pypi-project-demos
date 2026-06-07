@@ -1,0 +1,16 @@
+{
+  "name": "audiosentinel",
+  "version": "1.0.0",
+  "description": "This is a Cloudflare Worker demo for the [`audiosentinel`](https://pypi.org/project/audiosentinel/) PyPI package.  It provides an interface to detect whether an uploaded audio file is human-recorded or AI-generated.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "wrangler": "^4.98.0"
+  }
+}

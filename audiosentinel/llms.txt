@@ -1,0 +1,13 @@
+# audiosentinel Demo Worker
+
+This folder contains a Cloudflare Worker demonstration of the `audiosentinel` Python package.
+The demo provides a web interface where users can upload an audio file, and the worker utilizes `audiosentinel` to evaluate if the audio is likely human-recorded or AI-generated.
+
+Features:
+- Pure-Python execution via Pyodide.
+- Minimalist, fast, and interactive UI for audio upload.
+- Displays analysis results (Human vs AI).
+
+Relevant Links:
+- PyPI: https://pypi.org/project/audiosentinel/
+- Author: https://pypi.rosetraviss.uk
