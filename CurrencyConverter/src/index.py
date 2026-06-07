@@ -25,6 +25,56 @@ import zipfile
 from datetime import date, datetime
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Documentation & Assets
+# ─────────────────────────────────────────────────────────────────────────────
+
+LLMS_TXT = """# CurrencyConverter Demo API
+
+> Live demo API and UI for the `CurrencyConverter` package on Cloudflare Workers, providing real-time and historical currency exchange conversions.
+
+## Deployment Details
+- **Demo URL**: https://CurrencyConverter.pypi.rosetraviss.uk
+- **Package Page**: https://pypi.rosetraviss.uk/CurrencyConverter
+- **Primary Host**: https://pypi.rosetraviss.uk
+
+## API Endpoints
+
+### `GET /api/info`
+Returns general metadata about the currency converter instance, bounds of rate availability, supported currencies, and exchange rates relative to the Euro.
+
+#### Response Body
+- `currencies` (array of strings): List of all supported currency codes (e.g., `USD`, `GBP`).
+- `bounds` (array of objects): Earliest and latest data date available for each currency.
+- `rates` (array of objects): Map of each currency to its value in EUR.
+- `earliest_date` (string): Earliest date with rates.
+- `latest_date` (string): Latest date with rates.
+- `version` (string): Version of `currency-converter` installed.
+
+---
+
+### `GET /api/convert`
+Performs conversion on an amount.
+
+#### Query Parameters
+- `amount` (number, required): The amount to convert.
+- `from` (string, required): The 3-letter source currency code (e.g., `USD`).
+- `to` (string, required): The 3-letter target currency code (e.g., `EUR`).
+- `date` (string, optional): Date in `YYYY-MM-DD` format to get historical rates.
+
+#### Response Body
+- `amount` (number): Input amount.
+- `from` (string): Source currency code.
+- `to` (string): Target currency code.
+- `result` (number): Converted amount.
+- `rate` (number): Conversion rate applied.
+- `date` (string): Date of the conversion rate data.
+- `call` (string): The Python library call representation.
+"""
+
+FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💱</text></svg>"""
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Module-level converter (loaded once from bundled ECB data)
 # c = CurrencyConverter() uses the CSV bundled inside the wheel — no HTTP needed.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -51,6 +101,7 @@ HTML = r"""<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CurrencyConverter Demo · Cloudflare Python Worker</title>
   <meta name="description" content="Live demo of the CurrencyConverter PyPI package running as a Cloudflare Python Worker, using real European Central Bank data bundled with the package.">
+  <link rel="icon" href="/favicon.ico" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -214,7 +265,7 @@ HTML = r"""<!DOCTYPE html>
     <header>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span class="badge badge-cf">⚡ Cloudflare Python Worker</span>
-        <a href="https://pypi.org/project/CurrencyConverter/" class="badge badge-pypi" target="_blank" rel="noopener">
+        <a href="https://pypi.rosetraviss.uk/CurrencyConverter" class="badge badge-pypi" target="_blank" rel="noopener">
           📦 pip install CurrencyConverter
         </a>
       </div>
@@ -454,9 +505,10 @@ c.convert(<span class="nm">100</span>, <span class="st">'EUR'</span>, <span clas
 
     <footer>
       <p>
-        Using <a href="https://pypi.org/project/CurrencyConverter/" target="_blank" rel="noopener">CurrencyConverter</a> PyPI package ·
+        Using <a href="https://pypi.rosetraviss.uk/CurrencyConverter" target="_blank" rel="noopener">CurrencyConverter</a> PyPI package ·
         ECB data since 1999 ·
-        Runs on <a href="https://developers.cloudflare.com/workers/languages/python/" target="_blank" rel="noopener">Cloudflare Python Workers</a> (Pyodide/WASM)
+        Runs on <a href="https://developers.cloudflare.com/workers/languages/python/" target="_blank" rel="noopener">Cloudflare Python Workers</a> (Pyodide/WASM) ·
+        Back to <a href="https://pypi.rosetraviss.uk" target="_blank">pypi.rosetraviss.uk</a>
       </p>
     </footer>
   </div>
@@ -751,6 +803,14 @@ async def on_fetch(request, env):
     # Normalise path: strip protocol+host
     if "://" in path:
         path = "/" + path.split("/", 3)[-1]
+
+    if path == "/llms.txt" or path == "/llms-full.txt":
+        headers = Headers.new({"Content-Type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"}.items())
+        return Response.new(LLMS_TXT, headers=headers)
+
+    if path == "/favicon.ico":
+        headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
+        return Response.new(FAVICON_SVG, headers=headers)
 
     if path == "/api/info":
         return await handle_info()
