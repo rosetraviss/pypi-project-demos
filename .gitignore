@@ -219,3 +219,5 @@ __marimo__/
 
 node_modules
 .wrangler
+
+atlaslevels/.venv/

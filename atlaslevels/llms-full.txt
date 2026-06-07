@@ -1,0 +1,32 @@
+# atlaslevels Cloudflare Worker Demo - Full Documentation
+
+> A Python-based Cloudflare Worker demo for the `atlaslevels` package.
+
+This worker provides an interactive web interface and JSON API to demonstrate the `atlaslevels` library, showcasing tools for brain atlas ontology structures, hierarchy bundles, and validation mechanisms. It relies on the built-in presets provided by the package, namely the `allen_ccfv3` ontology and `allen_gm` hierarchy bundle.
+
+## Architecture
+
+- **Platform:** Cloudflare Workers using the Pyodide (Python) environment.
+- **Dependency Management:** Managed via `uv` with a local `pyproject.toml` (setting `package = false`) and `uv.lock`.
+- **Worker Configuration:** Defined in `wrangler.toml` using `compatibility_flags = ["python_workers"]` and pointing to `src/index.py`.
+
+## API Endpoints
+
+1. **`/api/info`:**
+   Returns core information about the demo environment and standard metadata regarding `atlaslevels` presets.
+
+2. **`/api/ontology?id=<id>`:**
+   Resolves nodes using the preset `allen_ccfv3` ontology. By default, it retrieves the root node details, or specifically queries a node by ID (e.g. `8`).
+
+3. **`/api/bundle`:**
+   Queries the `allen_gm` hierarchy bundle to extract level names, depths, and parent mappings, demonstrating the structural relationships available within `atlaslevels`.
+
+4. **`/api/validate`:**
+   Runs the `atlaslevels.validation.validate_bundle` function comparing the preset bundle and ontology, displaying the validation results and any issues found.
+
+## Error Handling
+Given the constrained Pyodide environment, importing and working with packages that possess deep dependencies (like `pandas` which is used by `atlaslevels`) might throw errors depending on the specifics of Pyodide's build. This demo gracefully catches these exceptions, returning descriptive JSON errors to the frontend while keeping the web UI functional to present the library's theoretical usage.
+
+## Resources
+- PyPI: [atlaslevels](https://pypi.org/project/atlaslevels/)
+- Mirror: [https://pypi.rosetraviss.uk](https://pypi.rosetraviss.uk)

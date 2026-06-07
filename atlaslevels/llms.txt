@@ -1,0 +1,11 @@
+# atlaslevels Cloudflare Worker Demo
+
+> A Python-based Cloudflare Worker demo for the `atlaslevels` package.
+
+This worker provides an interactive web interface and JSON API to demonstrate the `atlaslevels` library, showcasing tools for brain atlas ontology structures, hierarchy bundles, and validation mechanisms. It loads built-in presets like `allen_ccfv3` and `allen_gm`.
+
+Dependencies are managed using `uv` with a `pyproject.toml` file, running under Pyodide in Cloudflare Workers using `compatibility_flags = ["python_workers"]`.
+
+## Resources
+- PyPI: [atlaslevels](https://pypi.org/project/atlaslevels/)
+- Mirror: [https://pypi.rosetraviss.uk](https://pypi.rosetraviss.uk)
