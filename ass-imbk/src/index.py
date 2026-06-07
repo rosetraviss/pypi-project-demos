@@ -254,18 +254,18 @@ HTML = f"""<!DOCTYPE html>
 
         const list = document.getElementById('events-list');
         if (data.events && data.events.length > 0) {{
-          const escapeHtml = (unsafe) => {
+          const escapeHtml = (unsafe) => {{
             return (unsafe || '').toString()
               .replace(/&/g, "&amp;")
               .replace(/</g, "&lt;")
               .replace(/>/g, "&gt;")
               .replace(/"/g, "&quot;")
               .replace(/'/g, "&#039;");
-          };
+          }};
           list.innerHTML = data.events.map(e =>
             `<div class="event-row">
-              <div class="event-time">${escapeHtml(e.start)} → ${escapeHtml(e.end)}</div>
-              <div class="event-text" title="${escapeHtml(e.text)}">${escapeHtml(e.text)}</div>
+              <div class="event-time">${{escapeHtml(e.start)}} → ${{escapeHtml(e.end)}}</div>
+              <div class="event-text" title="${{escapeHtml(e.text)}}">${{escapeHtml(e.text)}}</div>
             </div>`
           ).join('');
         }} else {{
