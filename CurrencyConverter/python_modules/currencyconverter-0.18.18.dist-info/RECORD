@@ -1,4 +1,4 @@
-bin/currency_converter.exe,sha256=s2cR6j6Q1XiRe7-H4iiEE-0hDcehgAZwM18n-eb_O5A,47616
+bin/currency_converter.exe,sha256=jlOYtM3fw7Rccz3LNxx1S8bnOf1REqudPFZDiPkokjE,47616
 currency_converter/__init__.py,sha256=EMEelF3Wzt5hTMxIjfRhIAklvz3L6vs_00_XI9zC9j0,119
 currency_converter/__main__.py,sha256=bhZg20647zjIuW00n5A6ASt2x9qVHGSaciRKiPq-4ho,3165
 currency_converter/_version.py,sha256=VxMZU6GhlyT-cuGffr4xsxzUORDLN1ThyQeSMKUFTKs,24
