@@ -1,0 +1,17 @@
+# assinafy Demo API
+
+> Live demo API and UI for the `assinafy` package on Cloudflare Workers, providing an interface to verify SDK capabilities.
+
+## Deployment Details
+- **Demo URL**: https://assinafy.pypi.rosetraviss.uk
+- **Package Page**: https://pypi.rosetraviss.uk/assinafy
+- **Primary Host**: https://pypi.rosetraviss.uk
+
+## API Endpoint
+
+### `GET /api/info`
+Returns general metadata confirming the package functionality in the Cloudflare Python Worker environment.
+
+#### Response Body
+- `version` (string): The current SDK version initialized.
+- `client_resources` (array of strings): A list of API resources instantiated properly on the AssinafyClient object.
