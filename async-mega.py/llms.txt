@@ -1,0 +1,11 @@
+# async-mega.py Cloudflare Worker Demo
+
+This directory contains a demonstration of running `async-mega.py` in a Cloudflare Worker environment.
+
+## Context
+
+Cloudflare Workers running Python utilize Pyodide. Since Pyodide does not support native C-extensions like `pycryptodome` out-of-the-box, this demo utilizes mock modules for `Crypto` to demonstrate that the worker can be initialized and the module loaded.
+
+## Structure
+- `src/index.py`: The worker script containing the HTTP router, Crypto mocking, and HTML frontend.
+- `pyproject.toml` / `wrangler.toml`: Worker configuration files.
