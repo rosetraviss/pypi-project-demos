@@ -3,8 +3,9 @@ assisted-service-client Demo — Cloudflare Python Worker
 """
 
 import json
+from urllib.parse import urlparse
 import assisted_service_client
-from assisted_service_client import Configuration, ApiClient
+from assisted_service_client import Configuration
 
 from js import Response, Headers
 
