@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timezone
-from pyodide.ffi import to_js
+# pyrefly: ignore [missing-import]
 from js import Response, Headers
 
 
@@ -365,6 +365,7 @@ async def handle_asof(query: dict):
         parsed_date = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
 
         # Call the PyPI API directly using pyfetch
+        # pyrefly: ignore [missing-import]
         from pyodide.http import pyfetch
         import sys
         from types import ModuleType
@@ -387,11 +388,14 @@ async def handle_asof(query: dict):
             raise FileNotFoundError("Subprocesses are not supported in Emscripten/Pyodide")
         subprocess.run = mock_run
 
+        # pyrefly: ignore [missing-import]
         import asof
         import json
         from collections import defaultdict
         import datetime as dt
+        # pyrefly: ignore [missing-import]
         from packaging.version import Version
+        # pyrefly: ignore [missing-import]
         from packaging.version import VERSION_PATTERN as version_pattern_str
         import re
 
@@ -415,7 +419,7 @@ async def handle_asof(query: dict):
         version_strs = sorted(grouped.keys(), key=Version)
         version_strs.reverse()
 
-        from asof.pypi import is_compatible
+        from asof.pypi import is_compatible # pyrefly: ignore [missing-import]
 
         matches = []
         for version_str in version_strs:
