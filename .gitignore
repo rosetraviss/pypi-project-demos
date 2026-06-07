@@ -219,3 +219,14 @@ __marimo__/
 
 node_modules
 .wrangler
+
+astrocyte-integration-tavus/*
+!astrocyte-integration-tavus/src/
+!astrocyte-integration-tavus/src/index.py
+!astrocyte-integration-tavus/pyproject.toml
+!astrocyte-integration-tavus/wrangler.toml
+!astrocyte-integration-tavus/README.md
+!astrocyte-integration-tavus/uv.lock
+!astrocyte-integration-tavus/requirements.txt
+!astrocyte-integration-tavus/llms.txt
+!astrocyte-integration-tavus/llms-full.txt
