@@ -77,6 +77,7 @@ mock_requests.exceptions = ModuleType("exceptions")
 mock_requests.exceptions.RequestException = Exception
 
 sys.modules["requests"] = mock_requests
+sys.modules["requests.exceptions"] = mock_requests.exceptions
 
 # Also mock paho-mqtt just in case it attempts to initialize threads or sockets
 class MockMQTT:
@@ -338,8 +339,8 @@ async def handle_run():
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = "/" + url.split("://", 1)[1].split("/", 1)[-1].split("?")[0] if "://" in url else url.split("?")[0]
+    from urllib.parse import urlparse
+    path = urlparse(request.url).path or "/"
 
     if path == "/":
         headers = Headers.new([("Content-Type", "text/html; charset=utf-8")])
