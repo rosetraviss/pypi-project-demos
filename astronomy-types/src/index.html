@@ -113,7 +113,9 @@
           <div class="info-item"><strong>Selected Conversions:</strong> ${data.functions.filter(f => f.includes('to_')).join(', ')}</div>
         `;
       } catch (err) {
-        document.getElementById('pkg-info').innerHTML = `<div class="error">Error loading info: ${err.message}</div>`;
+        const grid = document.getElementById('pkg-info');
+        grid.innerHTML = '<div class="error">Error loading info: <span class="err-msg"></span></div>';
+        grid.querySelector('.err-msg').textContent = err.message;
       }
     }
 
@@ -125,9 +127,12 @@
         const res = await fetch(url);
         const data = await res.json();
         if (data.error) throw new Error(data.error);
-        el.innerHTML = `<div class="success"><strong>Result:</strong> ${data.result}</div><div class="meta"><code>${data.call}</code></div>`;
+        el.innerHTML = '<div class="success"><strong>Result:</strong> <span class="res-val"></span></div><div class="meta"><code class="call-val"></code></div>';
+        el.querySelector('.res-val').textContent = data.result;
+        el.querySelector('.call-val').textContent = data.call;
       } catch (err) {
-        el.innerHTML = `<div class="error">${err.message}</div>`;
+        el.innerHTML = '<div class="error"></div>';
+        el.querySelector('.error').textContent = err.message;
       }
     }
 

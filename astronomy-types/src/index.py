@@ -13,14 +13,8 @@ def json_response(data, status=200):
     return Response.new(json.dumps(data), headers=headers, status=status)
 
 def parse_qs(url_str: str) -> dict:
-    query = {}
-    if "?" in url_str:
-        qs = url_str.split("?", 1)[1].split("#")[0]
-        for part in qs.split("&"):
-            if "=" in part:
-                k, v = part.split("=", 1)
-                query[k] = v
-    return query
+    from urllib.parse import urlparse, parse_qsl
+    return dict(parse_qsl(urlparse(url_str).query))
 
 async def handle_info():
     try:
@@ -75,15 +69,16 @@ async def handle_convert(qs: dict):
         else:
             return json_response({"error": "Unknown conversion type"}, status=400)
 
+    except (ValueError, TypeError) as e:
+        return json_response({"error": f"Invalid input parameters: {str(e)}"}, status=400)
     except Exception as e:
         return json_response({"error": str(e), "trace": traceback.format_exc()}, status=500)
 
 async def on_fetch(request, env):
+    from urllib.parse import urlparse
     url = str(request.url)
     qs = parse_qs(url)
-    path = url.split("?")[0]
-    if "://" in path:
-        path = "/" + path.split("/", 3)[-1]
+    path = urlparse(url).path
 
     if path == "/favicon.ico":
         headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
