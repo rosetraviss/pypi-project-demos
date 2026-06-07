@@ -1,0 +1,3 @@
+# astronomy-types Cloudflare Worker
+
+This is a demo for astronomy-types running as a Python Cloudflare Worker. It demonstrates simple astronomical conversions using the package's type-safe constructs. For details on usage, see the /api/info and /api/convert endpoints or visit https://pypi.rosetraviss.uk/astronomy-types.
