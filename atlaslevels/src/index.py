@@ -26,12 +26,11 @@ def json_response(data, status=200):
     return Response.new(json.dumps(data), headers=headers, status=status)
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = url.split("?")[0]
-    if "://" in path:
-        path = "/" + path.split("/", 3)[-1]
+    from urllib.parse import urlparse, parse_qsl
+    parsed_url = urlparse(request.url)
+    path = parsed_url.path or "/"
+    qs = dict(parse_qsl(parsed_url.query))
 
-    qs = parse_qs(url)
     if path == "/api/info":
         return await handle_info()
     elif path == "/api/ontology":
@@ -51,15 +50,7 @@ async def on_fetch(request, env):
 # API Endpoints
 # ─────────────────────────────────────────────────────────────────────────────
 
-def parse_qs(url_str: str) -> dict:
-    query = {}
-    if "?" in url_str:
-        qs = url_str.split("?", 1)[1].split("#")[0]
-        for part in qs.split("&"):
-            if "=" in part:
-                k, v = part.split("=", 1)
-                query[k] = v
-    return query
+
 
 async def handle_info():
     if not ATLAS_IMPORTED:
@@ -87,6 +78,8 @@ async def handle_ontology(qs):
 
         try:
             node = ont.get_node(node_id)
+            if node is None:
+                return json_response({"error": f"Node with ID {node_id} not found."}, status=404)
             return json_response({
                 "id": node.id,
                 "name": node.name,
@@ -282,4 +275,4 @@ HTML = """<!DOCTYPE html>
 </html>
 """
 
-# Modify the favicon handler dynamically if missing
+
