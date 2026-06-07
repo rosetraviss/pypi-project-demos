@@ -332,14 +332,11 @@ FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
 
 def parse_qs(url_str: str) -> dict:
     """Extract query parameters from a URL string."""
-    query = {}
-    if "?" in url_str:
-        qs = url_str.split("?", 1)[1].split("#")[0]
-        for part in qs.split("&"):
-            if "=" in part:
-                k, v = part.split("=", 1)
-                query[k] = v
-    return query
+    from urllib.parse import urlparse, parse_qsl
+    try:
+        return dict(parse_qsl(urlparse(url_str).query))
+    except Exception:
+        return {}
 
 def json_response(data, status=200):
     headers = Headers.new({
@@ -376,11 +373,8 @@ async def handle_asof(query: dict):
         url = f"https://pypi.org/simple/{pkg}/"
         resp = await pyfetch(url, headers={"Accept": "application/vnd.pypi.simple.v1+json"})
 
-        if resp.status == 404:
-            return json_response({"error": f"Package '{pkg}' not found on PyPI"}, status=404)
-
         if not resp.ok:
-            return json_response({"error": f"{resp.status}: {resp.status_text} when attempting to query PyPI"}, status=502)
+            return json_response({"error": f"{resp.status}: {resp.status_text} when attempting to query PyPI"}, status=500)
 
         json_data = await resp.string()
         file_objs = json.loads(json_data)["files"]
@@ -449,8 +443,7 @@ async def handle_asof(query: dict):
         return json_response({"error": str(e)}, status=400)
     except Exception as e:
         import traceback
-        print(f"Error handling request: {e}\n{traceback.format_exc()}")
-        return json_response({"error": "An unexpected error occurred while processing your request."}, status=500)
+        return json_response({"error": str(e), "traceback": traceback.format_exc()}, status=500)
 
 async def on_fetch(request, env):
     url = str(request.url)
