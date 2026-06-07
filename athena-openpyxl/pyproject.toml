@@ -1,0 +1,17 @@
+[project]
+name = "athena-openpyxl-demo"
+version = "0.1.0"
+description = "athena-openpyxl PyPI demo running as a Cloudflare Python Worker"
+requires-python = ">=3.12"
+dependencies = [
+    "athena-openpyxl==0.15.1",
+]
+
+[dependency-groups]
+dev = [
+    "workers-py",
+    "workers-runtime-sdk",
+]
+
+[tool.uv]
+package = false
