@@ -334,13 +334,13 @@ def solve_siblings(parents):
 
     X, Y, Z = aspish.var("X"), aspish.var("Y"), aspish.var("Z")
 
-    # rule: sibling(Y, Z) :- parent(X, Y), parent(X, Z), Y < Z.
+    # rule: sibling(Y, Z) :- parent(X, Y), parent(X, Z), Y != Z.
     rule = aspish.language.Rule(
         head=Sibling(name1=Y, name2=Z),
         body=(
             Parent(name=X, child=Y),
             Parent(name=X, child=Z),
-            Y < Z
+            Y != Z
         )
     )
     solver.add(rule)
@@ -377,11 +377,11 @@ async def handle_solve(request):
         for p in parents:
             if not isinstance(p, dict):
                 return json_response({"error": "Each parent entry must be an object"}, status=400)
-            name = str(p.get("name", "")).strip()
-            child = str(p.get("child", "")).strip()
+            name = p.get("name")
+            child = p.get("child")
             if not name or not child:
                 return json_response({"error": "Each parent entry must have non-empty 'name' and 'child'"}, status=400)
-            validated_parents.append({"name": name, "child": child})
+            validated_parents.append({"name": str(name), "child": str(child)})
 
         siblings = solve_siblings(validated_parents)
         return json_response({"siblings": siblings})
@@ -398,8 +398,10 @@ def json_response(data, status=200):
 async def on_fetch(request, env):
     path = urlparse(request.url).path
 
-    if request.method == "POST" and path == "/api/solve":
-        return await handle_solve(request)
+    if path == "/api/solve":
+        if request.method == "POST":
+            return await handle_solve(request)
+        return json_response({"error": "Method Not Allowed"}, status=405)
 
     if path == "/favicon.ico":
         headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
@@ -413,5 +415,8 @@ async def on_fetch(request, env):
         headers = Headers.new({"Content-Type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"}.items())
         return Response.new(LLMS_FULL_TXT, headers=headers)
 
-    headers = Headers.new({"Content-Type": "text/html; charset=utf-8"}.items())
-    return Response.new(HTML, headers=headers)
+    if path in ("/", "/index.html"):
+        headers = Headers.new({"Content-Type": "text/html; charset=utf-8"}.items())
+        return Response.new(HTML, headers=headers)
+
+    return json_response({"error": "Not Found"}, status=404)
