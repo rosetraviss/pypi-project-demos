@@ -4,6 +4,14 @@ import sys
 
 from js import Response, Headers
 
+# Mock pandas and numpy before importing atlaslevels to allow serverless execution without native binaries
+from unittest.mock import MagicMock
+sys.modules['numpy'] = MagicMock()
+sys.modules['pandas'] = MagicMock()
+pandas_mock = sys.modules['pandas']
+pandas_mock.DataFrame = MagicMock
+pandas_mock.Series = MagicMock
+
 try:
     import atlaslevels
     import atlaslevels.validation
