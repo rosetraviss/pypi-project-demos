@@ -1,6 +1,26 @@
 import json
 import traceback
+import sys
+from types import ModuleType
 from js import Response, Headers
+
+# Mock numba and llvmlite to prevent loading native binary dependencies not supported/present in Pyodide
+class NumbaMock(ModuleType):
+    def __getattr__(self, name):
+        def decorator(*args, **kwargs):
+            if len(args) == 1 and callable(args[0]):
+                return args[0]
+            return lambda f: f
+        return decorator
+
+numba_mock = NumbaMock("numba")
+numba_mock.core = ModuleType("numba.core")
+numba_mock.core.decorators = numba_mock
+sys.modules["numba"] = numba_mock
+sys.modules["numba.core"] = numba_mock.core
+sys.modules["numba.core.decorators"] = numba_mock.core.decorators
+sys.modules["llvmlite"] = ModuleType("llvmlite")
+
 
 HTML_CONTENT = """<!DOCTYPE html>
 <html lang="en">
