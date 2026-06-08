@@ -1,8 +1,0 @@
-# athena-openpyxl Demo API
-
-> Live demo API and UI for the `athena-openpyxl` package on Cloudflare Workers.
-
-## Deployment Details
-- **Demo URL**: https://athena-openpyxl.pypi.rosetraviss.uk
-- **Package Page**: https://pypi.rosetraviss.uk/athena-openpyxl
-- **Primary Host**: https://pypi.rosetraviss.uk

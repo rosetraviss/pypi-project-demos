@@ -3,10 +3,11 @@ import sys
 import os
 from js import Response, Headers
 
-sys.path.insert(0, "./python_modules")
+root_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(root_dir, "python_modules"))
 
 def mock_requests():
-    """Mock the requests module to use js.fetch"""
+    """Mock the requests, requests.adapters, and urllib3 modules using MagicMock to avoid import issues in Pyodide"""
     import sys
     from unittest.mock import MagicMock
     sys.modules['requests'] = MagicMock()
@@ -21,32 +22,7 @@ import openpyxl
 
 FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📊</text></svg>"""
 
-# Using explicit variables for text content since file access might be tricky in workers
-README_MD = """# athena-openpyxl Cloudflare Python Worker Demo
-
-This is a demonstration of the `athena-openpyxl` package running inside a Cloudflare Python Worker.
-
-## Live Demo
-The demo is hosted at: [athena-openpyxl.pypi.rosetraviss.uk](https://athena-openpyxl.pypi.rosetraviss.uk)
-
-For documentation and library packages, see: [pypi.rosetraviss.uk/athena-openpyxl](https://pypi.rosetraviss.uk/athena-openpyxl)
-
-## Local Development
-Requires Python 3.12+ and `uv`.
-
-1. Run the local dev server using wrangler:
-   ```bash
-   npx wrangler dev
-   ```"""
-
-LLMS_TXT = """# athena-openpyxl Demo API
-
-> Live demo API and UI for the `athena-openpyxl` package on Cloudflare Workers.
-
-## Deployment Details
-- **Demo URL**: https://athena-openpyxl.pypi.rosetraviss.uk
-- **Package Page**: https://pypi.rosetraviss.uk/athena-openpyxl
-- **Primary Host**: https://pypi.rosetraviss.uk"""
+# Unused constants README_MD and LLMS_TXT removed
 
 HTML = """<!DOCTYPE html>
 <html lang="en">
@@ -182,18 +158,15 @@ async def handle_info():
         }
         return json_response(info)
     except Exception as e:
-        return json_response({"error": str(e)}, status=500)
+        print(f"Error in handle_info: {e}")
+        import traceback
+        traceback.print_exc()
+        return json_response({"error": "Internal Server Error"}, status=500)
 
 async def on_fetch(request, env):
-    url = str(request.url)
-    path = url.split("?")[0]
-
-    if "://" in path:
-        path = "/" + path.split("/", 3)[-1]
-
-    if path == "/llms.txt" or path == "/llms-full.txt":
-        headers = Headers.new({"Content-Type": "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*"}.items())
-        return Response.new(LLMS_TXT, headers=headers)
+    from urllib.parse import urlparse
+    parsed_url = urlparse(request.url)
+    path = parsed_url.path
 
     if path == "/favicon.ico":
         headers = Headers.new({"Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400"}.items())
